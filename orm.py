@@ -71,7 +71,7 @@ class CardLink(Base):
     link_title = Column(String)
     link_content = Column(String)
 
-engine = create_engine('postgresql+psycopg2://postgres:2488@localhost:5432/tcp_labs')
+engine = create_engine('postgresql+psycopg2://login:password@localhost:5432/database')
 Base.metadata.create_all(engine)
 
 
