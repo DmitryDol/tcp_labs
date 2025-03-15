@@ -2,6 +2,10 @@ from sqlalchemy import Enum, Text, ForeignKey, Column, Integer, String, create_e
 from sqlalchemy.orm import declarative_base
 import enum
 import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 Base = declarative_base()
 
