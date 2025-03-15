@@ -1,6 +1,7 @@
 from sqlalchemy import Enum, Text, ForeignKey, Column, Integer, String, create_engine, DateTime
 from sqlalchemy.orm import declarative_base
 import enum
+import os
 
 Base = declarative_base()
 
@@ -27,6 +28,7 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     name = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
+    avatar = Column(String, unique=True, nullable=False)
 
 class Roadmap(Base):
     __tablename__ = 'roadmaps'
@@ -49,6 +51,7 @@ class UserRoadmap(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
     roadmap_id = Column(Integer, ForeignKey('roadmaps.roadmap_id'), primary_key=True)
     role = Column(Enum(RoleEnum), nullable=False)
+    background = Column(String, unique=True, nullable=False)
 
 class RoadmapCard(Base):
     __tablename__ = 'roadmap_cards'
@@ -71,7 +74,7 @@ class CardLink(Base):
     link_title = Column(String)
     link_content = Column(String)
 
-engine = create_engine('postgresql+psycopg2://login:password@localhost:5432/database')
+engine = create_engine(f'postgresql+psycopg2://{os.getenv("DB_USER")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}')
 Base.metadata.create_all(engine)
 
 
