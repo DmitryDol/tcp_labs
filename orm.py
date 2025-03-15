@@ -1,6 +1,8 @@
-from sqlalchemy import Enum, Text, ForeignKey, Column, Integer, String, create_engine, DateTime
+from sqlalchemy import Enum, Text, ForeignKey, Column, Integer, String, DateTime
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
 import enum
+import asyncio
 import os
 from dotenv import load_dotenv
 
@@ -78,11 +80,13 @@ class CardLink(Base):
     link_title = Column(String)
     link_content = Column(String)
 
-engine = create_engine(f'postgresql+psycopg2://{os.getenv("DB_USER")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}')
-Base.metadata.create_all(engine)
+engine = create_async_engine(
+    f'postgresql+asyncpg://{os.getenv("DB_USER")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}'
+)
 
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
-
-
-
-
+if __name__ == "__main__":
+    asyncio.run(create_tables())
