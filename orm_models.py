@@ -1,15 +1,6 @@
 from sqlalchemy import Enum, Text, ForeignKey, Column, Integer, String, DateTime
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import declarative_base
+from database import Base
 import enum
-import asyncio
-import os
-from dotenv import load_dotenv
-
-
-load_dotenv()
-
-Base = declarative_base()
 
 class RoleEnum(enum.Enum):
     public = "public"
@@ -29,7 +20,7 @@ class DifficultyEnum(enum.Enum):
 class User(Base):
     __tablename__ = 'users'
 
-    user_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, primary_key=True, autoincrement=True)
     login = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     name = Column(String, nullable=False)
@@ -39,7 +30,7 @@ class User(Base):
 class Roadmap(Base):
     __tablename__ = 'roadmaps'
 
-    roadmap_id = Column(Integer, primary_key=True)
+    roadmap_id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(Text)
     difficulty = Column(Enum(DifficultyEnum), nullable=False)
@@ -47,7 +38,7 @@ class Roadmap(Base):
 class Card(Base):
     __tablename__ = 'cards'
 
-    card_id = Column(Integer, primary_key=True)
+    card_id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
     description = Column(Text)
 
@@ -79,14 +70,3 @@ class CardLink(Base):
     card_id = Column(Integer, ForeignKey('cards.card_id'), primary_key=True)
     link_title = Column(String)
     link_content = Column(String)
-
-engine = create_async_engine(
-    f'postgresql+asyncpg://{os.getenv("DB_USER")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_NAME")}'
-)
-
-async def create_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-if __name__ == "__main__":
-    asyncio.run(create_tables())
