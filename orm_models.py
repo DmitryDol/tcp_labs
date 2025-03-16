@@ -2,20 +2,6 @@ from sqlalchemy import Enum, Text, ForeignKey, Column, Integer, String, DateTime
 from database import Base
 import enum
 
-class RoleEnum(enum.Enum):
-    public = "public"
-    link_only = "link only"
-    private = "private"
-
-class StatusEnum(enum.Enum):
-    in_progress = "in_progress"
-    completed = "completed"
-    pending = "pending"
-
-class DifficultyEnum(enum.Enum):
-    easy = "easy"
-    medium = "medium"
-    hard = "hard"
 
 class User(Base):
     __tablename__ = 'users'
@@ -29,6 +15,11 @@ class User(Base):
 
 class Roadmap(Base):
     __tablename__ = 'roadmaps'
+
+    class DifficultyEnum(enum.Enum):
+        easy = "easy"
+        medium = "medium"
+        hard = "hard"
 
     roadmap_id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, nullable=False)
@@ -45,6 +36,11 @@ class Card(Base):
 class UserRoadmap(Base):
     __tablename__ = 'user_roadmaps'
 
+    class RoleEnum(enum.Enum):
+        public = "public"
+        link_only = "link only"
+        private = "private"
+
     user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
     roadmap_id = Column(Integer, ForeignKey('roadmaps.roadmap_id'), primary_key=True)
     role = Column(Enum(RoleEnum), nullable=False)
@@ -59,6 +55,11 @@ class RoadmapCard(Base):
 
 class UserCard(Base):
     __tablename__ = 'user_cards'
+
+    class StatusEnum(enum.Enum):
+        in_progress = "in_progress"
+        completed = "completed"
+        pending = "pending"
 
     user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
     card_id = Column(Integer, ForeignKey('cards.card_id'), primary_key=True)
