@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import SessionLocal
 from orm_models import User
 from faker import Faker
-import datetime
+from datetime import datetime
 
 current_year = datetime.utcnow().year
 current_month = datetime.utcnow().month
@@ -17,8 +17,8 @@ async def add_users():
             user = User(
                 name=name, 
                 login=name.lower().replace(" ", "_")+'@gmail.com',
-                # password_hash = ?,
-                created_at=fake.date_between(start_date=f"{current_year}-{current_month}-01", end_date="today"),
+                password_hash = fake.password(),
+                created_at = datetime.utcnow(),
                 avatar='standart_avatar'
             )
             users.append(user)
