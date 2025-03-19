@@ -15,7 +15,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    avatar: Mapped[str] = mapped_column(String, nullable=False)
+    avatar: Mapped[str] = mapped_column(String, nullable=False, server_default = "standart_avatar")
     
     owned_roadmaps: Mapped[List["Roadmap"]] = relationship(back_populates="owner")
     roadmaps: Mapped[List["UserRoadmap"]] = relationship(back_populates="user")
