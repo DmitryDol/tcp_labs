@@ -11,7 +11,7 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     name = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
-    avatar = Column(String, unique=True, nullable=False)
+    avatar = Column(String, nullable=False)
 
 class Roadmap(Base):
     __tablename__ = 'roadmaps'
@@ -41,10 +41,10 @@ class UserRoadmap(Base):
         link_only = "link only"
         private = "private"
 
-    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
-    roadmap_id = Column(Integer, ForeignKey('roadmaps.roadmap_id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key = True)
+    roadmap_id = Column(Integer, ForeignKey('roadmaps.roadmap_id'), primary_key = True)
     role = Column(Enum(RoleEnum), nullable=False)
-    background = Column(String, unique=True, nullable=False)
+    background = Column(String, nullable=False)
 
 class RoadmapCard(Base):
     __tablename__ = 'roadmap_cards'
@@ -68,6 +68,7 @@ class UserCard(Base):
 class CardLink(Base):
     __tablename__ = 'card_links'
 
-    card_id = Column(Integer, ForeignKey('cards.card_id'), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True) 
+    card_id = Column(Integer, ForeignKey('cards.card_id'), nullable=False) 
     link_title = Column(String)
     link_content = Column(String)
