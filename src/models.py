@@ -11,9 +11,9 @@ class User(Base):
     __tablename__ = 'users'
 
     user_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    login: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    login: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String, nullable=False)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(String(256), nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     avatar: Mapped[str] = mapped_column(String, nullable=False, server_default = "standart_avatar")
     
@@ -40,9 +40,9 @@ class Roadmap(Base):
         can_edit = "can_edit"
     
     roadmap_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.user_id', ondelete="CASCADE"))
+    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
 
-    title: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str] = mapped_column(String(256), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
     difficulty: Mapped[DifficultyEnum] = mapped_column(Enum(DifficultyEnum), nullable=False)
     
@@ -62,7 +62,7 @@ class Card(Base):
     card_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     roadmap_id: Mapped[int] = mapped_column(Integer, ForeignKey('roadmaps.roadmap_id', ondelete="CASCADE"), nullable=False)
     order_position: Mapped[int] = mapped_column(Integer, nullable=False)
-    title: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str] = mapped_column(String(256), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
     
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -110,7 +110,7 @@ class CardLink(Base):
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     card_id: Mapped[int] = mapped_column(Integer, ForeignKey('cards.card_id', ondelete="CASCADE"), nullable=False)
-    link_title: Mapped[Optional[str]] = mapped_column(String)
+    link_title: Mapped[Optional[str]] = mapped_column(String(256))
     link_content: Mapped[Optional[str]] = mapped_column(String)
     
     card: Mapped["Card"] = relationship(back_populates="links")
