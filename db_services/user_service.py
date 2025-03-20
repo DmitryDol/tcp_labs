@@ -5,37 +5,37 @@ import asyncio
 from faker import Faker
 from src.dto import UsersDTO
 
-async def add_user(data):
-    async with async_session_factory() as session:
-        session.add(data)
-        await session.commit()
 
-async def delete_user(user_id):
-    async with async_session_factory() as session:
-        user = await session.get(User, user_id)
-        if user: 
-            await session.delete(user)
+class UserService:
+    @staticmethod
+    async def add_user(data):
+        async with async_session_factory() as session:
+            session.add_all(data)
             await session.commit()
 
-async def update_user(user_id, name=None, login=None, password_hash=None, avatar = None):
-    async with async_session_factory() as session:
-        user = await session.get(User, user_id)
-        if user:
-            if name:
-                user.name = name
-            if login:
-                user.login = login
-            if password_hash:
-                user.password_hash = password_hash
-            if avatar:
-                user.avatar = avatar
-        await session.commit() 
+    @staticmethod
+    async def delete_user(user_id):
+        async with async_session_factory() as session:
+            user = await session.get(User, user_id)
+            if user: 
+                await session.delete(user)
+                await session.commit()
 
-async def get_user_info(user_id):
-    async with async_session_factory() as session:
-        user = await session.get(User, user_id)
-        user_dto = UsersDTO.model_validate(user, from_attributes=True)
-        return user_dto
+    @staticmethod
+    async def update_user(user_id, **params):
+        async with async_session_factory() as session:
+            user = await session.get(User, user_id)
+            if user:
+                for key, value in params.items():
+                    setattr(user, key, value)
+            await session.commit() 
+
+    @staticmethod
+    async def get_user_info(user_id):
+        async with async_session_factory() as session:
+            user = await session.get(User, user_id)
+            user_dto = UsersDTO.model_validate(user, from_attributes=True)
+            return user_dto
 
 
 
@@ -43,6 +43,7 @@ if __name__ == "__main__":
 
     # Пример с добавлением
     # fake = Faker('en_US')
+    # data = []
     # for _ in range(5):
     #     name = fake.name() 
     #     user = User(
@@ -50,10 +51,15 @@ if __name__ == "__main__":
     #         login=name.lower().replace(" ", "_")+'@gmail.com',
     #         password_hash = fake.password(),
     #     )
-    #     asyncio.run(add_user(user))
+    #     data.append(user)
+    #     asyncio.run(UserService.add_user(data))
 
     # Пример с удалением
     # asyncio.run(delete_user(5))
 
     # Получение информации о пользователе DTO
-    print(asyncio.run(get_user_info(3)))
+    # user = asyncio.run(UserService.get_user_info(3))
+    # print(user)
+
+    # Пример с обновлением
+    asyncio.run(UserService.update_user(4, name="Ivan Ivanov", login="ivanov@gmail.com"))
