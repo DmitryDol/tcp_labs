@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASSWORD: str
     DB_NAME: str
+    DEFAULT_AVATAR: str
+    DEFAULT_BACKGROUND: str
 
     @property
     def DATABASE_URL_asyncpg(self):
