@@ -30,3 +30,25 @@ class CardAddDTO(BaseModel):
 
 class CardDTO(CardAddDTO):
     card_id: int
+
+class UserRoadmapAddDTO(BaseModel):
+    user_id: int
+    roadmap_id: int
+
+class UserRoadmapDTO(UserRoadmapAddDTO):
+    background: str
+
+class UserCardAddDTO(BaseModel):
+    user_id: int
+    card_id: int
+
+class UserCardDTO(UserCardAddDTO):
+    status: str
+
+class CardLinkAddDTO(BaseModel):
+    card_id: int
+    link_title: str
+    link_content: str
+
+class CardLinkDTO(CardLinkAddDTO):
+    id: int
