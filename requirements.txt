@@ -9,3 +9,5 @@ pydantic==2.10.6
 pydantic-settings==2.0.3
 uvicorn==0.23.2
 Faker==37.0.2
+
+black==25.1.0

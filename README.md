@@ -10,3 +10,7 @@
 ## ЛР1
 
 In .env file add default UUID values for user avatar (DEFAULT_AVATAR) and roadmap background (DEFAULT_BACKGROUND) from MinIO
+
+## ЛР2
+
+[alembic tutorial](src/migrations/alembic_tutorial.md)
