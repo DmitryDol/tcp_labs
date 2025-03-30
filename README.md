@@ -14,3 +14,7 @@ In .env file add default UUID values for user avatar (DEFAULT_AVATAR) and roadma
 ## ЛР2
 
 [alembic tutorial](src/migrations/alembic_tutorial.md)
+
+## ЛР3
+
+Переезд с pip на [uv](uv.md), с docker на docker-compose
