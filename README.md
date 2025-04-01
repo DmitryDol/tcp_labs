@@ -31,3 +31,4 @@ In .env file add default UUID values for user avatar (DEFAULT_AVATAR) and roadma
   * [ ] card_links
 * api
 * refactor code (again)
+* Возможно отказаться от updated_at в roadmaps, либо настроить изменение при редактировании карточек у данного роадмапа
