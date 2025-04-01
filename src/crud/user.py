@@ -1,3 +1,4 @@
+from sqlalchemy import insert, select
 from src.database import async_session_factory
 from src.models import User
 import asyncio
@@ -8,7 +9,22 @@ from src.dto import UsersDTO
 class User:
 
     @staticmethod
-    async def add_user(data: list[User]) -> None:
+    async def add_user(user: User) -> None:
+        """
+        Adds a list of User objects to the database.
+        Args:
+            user: A User object to be added to the database.
+        Returns:
+            None
+        """
+        async with async_session_factory() as session:
+            stmt = insert(User).values(**user)
+            res = await session.execute(stmt)
+            await session.commit()
+            return res
+
+    @staticmethod
+    async def add_users(data: list[User]) -> None:
         """
         Adds a list of User objects to the database.
         Args:
@@ -67,5 +83,18 @@ class User:
         """
         async with async_session_factory() as session:
             user = await session.get(User, user_id)
+            user_dto = UsersDTO.model_validate(user, from_attributes=True)
+            return user_dto
+        
+    @staticmethod
+    async def get_user_info_by_login(login: str) -> UsersDTO | None:
+        async with async_session_factory() as session:
+            stmt = select(User).where(User.login == login)
+            result = await session.execute(stmt)
+            user = result.scalar_one_or_none()
+
+            if user is None:
+                return None
+            
             user_dto = UsersDTO.model_validate(user, from_attributes=True)
             return user_dto
