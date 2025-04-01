@@ -1,6 +1,5 @@
 from datetime import datetime
-from sqlalchemy import DateTime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 
 class UsersAddDTO(BaseModel):
     name: str
@@ -10,7 +9,7 @@ class UsersAddDTO(BaseModel):
 
 class UsersDTO(UsersAddDTO):
     id: int
-    created_at: DateTime
+    created_at: datetime
 
 class UsersEditDTO(BaseModel):
     id: int
@@ -27,8 +26,8 @@ class RoadmapAddDTO(BaseModel):
 
 class RoadmapDTO(RoadmapAddDTO):
     id: int
-    created_at: DateTime
-    updated_at: DateTime
+    created_at: datetime
+    updated_at: datetime
 
 class RoadmapEditDTO(BaseModel):
     id: int
@@ -46,8 +45,8 @@ class CardAddDTO(BaseModel):
 
 class CardDTO(CardAddDTO):
     card_id: int
-    created_at: DateTime
-    updated_at: DateTime
+    created_at: datetime
+    updated_at: datetime
 
 class CardEditDTO(BaseModel):
     id: int
