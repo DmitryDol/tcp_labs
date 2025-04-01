@@ -1,4 +1,4 @@
-from crud import *
+from src.crud import *
 from src.models import *
 import asyncio
 from faker import Faker
