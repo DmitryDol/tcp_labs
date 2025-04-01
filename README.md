@@ -5,6 +5,7 @@
 ## ЛР0
 
 Презентация: https://docs.google.com/presentation/d/17_LZ12iUvj4OtdCWVxXDk7pI9Y-ayiKdLRb19UnVCOQ/edit?usp=sharing
+
 Отчет: https://docs.google.com/document/d/1LPiKWnQ9E7KnppfHBw2JA64IY4K4KiiCK2GvF-Naf_k/edit?usp=sharing
 
 ## ЛР1
@@ -18,3 +19,15 @@ In .env file add default UUID values for user avatar (DEFAULT_AVATAR) and roadma
 ## ЛР3
 
 Переезд с pip на [uv](uv.md), с docker на docker-compose
+
+### TODO:
+
+* Services:
+  * [X] users (done)
+  * [ ] roadmaps
+  * [ ] cards
+  * [ ] user_cards
+  * [ ] user_roadmaps
+  * [ ] card_links
+* api
+* refactor code (again)
