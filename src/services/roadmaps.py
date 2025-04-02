@@ -23,3 +23,7 @@ class RoadmapsService:
             roadmaps = await uow.roadmaps.find_all()
             return roadmaps
 
+    async def delete_roadmap(self, uow: IUnitOfWork, roadmap_id: int):
+        async with uow:
+            roadmap = await uow.roadmaps.delete_one(roadmap_id)
+            return roadmap
