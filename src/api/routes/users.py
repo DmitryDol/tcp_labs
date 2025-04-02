@@ -1,6 +1,7 @@
-from typing import Any
+from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
-
+from queries.orm import User
+from services import UserService
 from src import crud
 from src.database import async_session_factory
 
@@ -12,5 +13,6 @@ router = APIRouter(
 
 @router.post("/")
 async def add_user(
-    user: User
+    user: User,
+    users_service: Annotated[UserService, Depends(users_service)],
 )

@@ -1,17 +1,17 @@
 from datetime import datetime
 from pydantic import BaseModel
 
-class UsersAddDTO(BaseModel):
+class UserAddDTO(BaseModel):
     name: str
     login: str
     password_hash: str
     avatar: str
 
-class UsersDTO(UsersAddDTO):
+class UserDTO(UserAddDTO):
     id: int
     created_at: datetime
 
-class UsersEditDTO(BaseModel):
+class UserEditDTO(BaseModel):
     id: int
     password_hash: str
     avatar: str

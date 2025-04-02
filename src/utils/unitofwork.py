@@ -13,10 +13,10 @@ from repositories.card_links import CardLinkRepository
 class IUnitOfWork(ABC):
     users: Type[UserRepository]
     roadmaps: Type[RoadmapRepository]
-    card: Type[CardRepository]
-    user_card: Type[UserCardRepository]
-    user_roadmap: Type[UserRoadmapRepository]
-    card_link: Type[CardLinkRepository]
+    cards: Type[CardRepository]
+    user_cards: Type[UserCardRepository]
+    user_roadmaps: Type[UserRoadmapRepository]
+    card_links: Type[CardLinkRepository]
     
     @abstractmethod
     def __init__(self):
@@ -48,10 +48,10 @@ class UnitOfWork:
 
         self.users = UserRepository(self.session)
         self.roadmaps = RoadmapRepository(self.session)
-        self.card = CardRepository(self.session)
-        self.user_card = UserCardRepository(self.session)
-        self.user_roadmap = UserRoadmapRepository(self.session)
-        self.card_link = CardLinkRepository(self.session)
+        self.cards = CardRepository(self.session)
+        self.user_cards = UserCardRepository(self.session)
+        self.user_roadmaps = UserRoadmapRepository(self.session)
+        self.card_links = CardLinkRepository(self.session)
 
     async def __aexit__(self, *args):
         await self.rollback()
