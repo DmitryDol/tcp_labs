@@ -2,6 +2,8 @@ from db_services import *
 from src.models import *
 import asyncio
 from faker import Faker
+from src.utils import hash_password
+
 
 async def main():
     
@@ -12,7 +14,7 @@ async def main():
         user = User(
             name=name, 
             login=name.lower().replace(" ", "_")+'@gmail.com',
-            password_hash = fake.password(),
+            password_hash = hash_password(fake.password()),
         )
         data.append(user)
     await UserService.add_user(data)

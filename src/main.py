@@ -8,8 +8,7 @@ from src.queries.orm import AsyncORM
 
 
 async def main():
-    # await AsyncORM.create_tables()
-    await AsyncORM.drop_tables()
+    await AsyncORM.create_tables()
 
 if __name__ == "__main__":
     asyncio.run(main())
