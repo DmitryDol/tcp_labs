@@ -22,3 +22,8 @@ class UsersService:
         async with uow:
             users = await uow.users.find_all()
             return users
+        
+    async def delete_user(self, uow: IUnitOfWork, user_id: int):
+        async with uow:
+            user = await uow.users.delete_one(user_id)
+            return user
