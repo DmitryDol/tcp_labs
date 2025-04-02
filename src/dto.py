@@ -44,7 +44,7 @@ class CardAddDTO(BaseModel):
     order_position: int
 
 class CardDTO(CardAddDTO):
-    card_id: int
+    id: int
     created_at: datetime
     updated_at: datetime
 
