@@ -8,7 +8,6 @@ import sys
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 
 
-
 app = FastAPI(
     title="Сервис для трекинга карьеры"
 )
