@@ -4,7 +4,7 @@ import asyncio
 from src.dto import UserCardDTO
 
 
-class UserCardService:
+class UserCard:
 
     @staticmethod
     async def add_user_card(data: list[UserCard]) -> None:
@@ -66,40 +66,3 @@ class UserCardService:
             user_card = await session.get(UserCard, user_card_id)
             roadmap_dto = UserCardDTO.model_validate(user_card, from_attributes=True)
             return roadmap_dto
-
-
-if __name__ == "__main__":
-    # data = [
-    #     UserCard(
-    #         user_id=2,
-    #         card_id=1,
-    #     ),
-    #     UserCard(
-    #         user_id=2,
-    #         card_id=2,
-    #     ),
-    #     UserCard(
-    #         user_id=2,
-    #         card_id=3,
-    #     ),
-    #     UserCard(
-    #         user_id=1,
-    #         card_id=4,
-    #     ),
-    #     UserCard(
-    #         user_id=1,
-    #         card_id=5,
-    #     ),
-    #     UserCard(
-    #         user_id=1,
-    #         card_id=6,
-    #     )
-    # ]
-    # asyncio.run(UserCardService.add_user_card(data))
-
-    # asyncio.run(UserCardService.delete_user_card((2, 1)))
-    # asyncio.run(UserCardService.update_user_card((1, 4), status=UserCard.StatusEnum.in_progress))
-
-    # проверка получения информации 
-    roadmap = asyncio.run(UserCardService.get_user_card_info((1, 4)))
-    print(roadmap)

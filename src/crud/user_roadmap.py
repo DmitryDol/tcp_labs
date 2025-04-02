@@ -4,7 +4,7 @@ import asyncio
 from src.dto import UserRoadmapDTO
 
 
-class UserRoadmapService:
+class UserRoadmap:
 
     @staticmethod
     async def add_user_roadmap(data: list[UserRoadmap]) -> None:
@@ -66,24 +66,3 @@ class UserRoadmapService:
             user_roadmap = await session.get(UserRoadmap, user_roadmap_id)
             roadmap_dto = UserRoadmapDTO.model_validate(user_roadmap, from_attributes=True)
             return roadmap_dto
-
-
-if __name__ == "__main__":
-    # data = [
-    #     UserRoadmap(
-    #         user_id=1,
-    #         roadmap_id=1
-    #     ),
-    #     UserRoadmap(
-    #         user_id=2,
-    #         roadmap_id=2
-    #     ) 
-    # ]
-    # asyncio.run(UserRoadmapService.add_user_roadmap(data))
-
-    # asyncio.run(UserRoadmapService.delete_user_roadmap(2))
-    # asyncio.run(UserRoadmapService.update_user_roadmap((1, 1), background="smth.jpg"))
-
-    # # проверка получения информации 
-    roadmap = asyncio.run(UserRoadmapService.get_user_roadmap_info((1, 1)))
-    print(roadmap)

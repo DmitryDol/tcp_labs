@@ -4,10 +4,10 @@ import asyncio
 from src.dto import RoadmapDTO
 
 
-class RoadmapService:
+class Roadmap:
 
     @staticmethod
-    async def add_roadmap(data: list[Roadmap]):
+    async def add_roadmap(data: list[Roadmap]) -> None:
         """
         Adds a list of Roadmap objects to the database.
         Args:
@@ -20,7 +20,7 @@ class RoadmapService:
             await session.commit()
 
     @staticmethod
-    async def delete_roadmap(roadmap_id: int):
+    async def delete_roadmap(roadmap_id: int) -> None:
         """
         Deletes a roadmap from the database by its ID.
         Args:
@@ -35,7 +35,7 @@ class RoadmapService:
                 await session.commit()
 
     @staticmethod
-    async def update_roadmap(roadmap_id: int, **params):
+    async def update_roadmap(roadmap_id: int, **params) -> None:
         """
         Updates the attributes of a roadmap in the database.
         Args:
@@ -59,7 +59,7 @@ class RoadmapService:
             await session.commit()
 
     @staticmethod
-    async def get_roadmap_info(roadmap_id):
+    async def get_roadmap_info(roadmap_id) -> RoadmapDTO:
          """
         Returns roadmap information based on the provided user ID.
         Args:
@@ -71,32 +71,3 @@ class RoadmapService:
             roadmap = await session.get(Roadmap, roadmap_id)
             roadmap_dto = RoadmapDTO.model_validate(roadmap, from_attributes=True)
             return roadmap_dto
-
-
-if __name__ == "__main__":
-    # data = [
-    #     Roadmap(
-    #     title="Алгоритмы и структуры данных",
-    #     owner_id=1,
-    #     description="Руководство по изучению базовых и продвинутых алгоритмов для эффективного программирования",
-    #     difficulty= Roadmap.DifficultyEnum.medium,
-    #     edit_permission=Roadmap.EditPermissionEnum.can_edit,
-    #     visibility=Roadmap.VisibilityEnum.public
-    # ),
-    #     Roadmap(
-    #     title="Машинное обучение с нуля",
-    #     owner_id = 3,
-    #     description="Последовательный план изучения основ машинного обучения: от базовых концепций до реализации моделей.",
-    #     difficulty=Roadmap.DifficultyEnum.hard,
-    #     edit_permission=Roadmap.EditPermissionEnum.view_only,
-    #     visibility=Roadmap.VisibilityEnum.link_only
-    # ) 
-    # ]
-    # asyncio.run(RoadmapService.add_roadmap(data))
-
-    asyncio.run(RoadmapService.delete_roadmap(2))
-    # asyncio.run(RoadmapService.update_roadmap(3, visibility=Roadmap.VisibilityEnum.public))
-
-    # проверка получения информации 
-    # roadmap = asyncio.run(RoadmapService.get_roadmap_info(1))
-    # print(roadmap)

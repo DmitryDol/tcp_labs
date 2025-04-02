@@ -2,6 +2,7 @@ from sqlalchemy import String, Text, ForeignKey, Enum, Integer, DateTime, Unique
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 from typing import Optional, List
 from src.config import settings
+from src.dto import *
 import enum
 
 
@@ -11,7 +12,7 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = 'users'
 
-    user_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     login: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String(256), nullable=False)
@@ -22,6 +23,10 @@ class User(Base):
     owned_roadmaps: Mapped[List["Roadmap"]] = relationship(back_populates="owner", passive_deletes=True)
     roadmaps: Mapped[List["UserRoadmap"]] = relationship(back_populates="user", passive_deletes=True)
     cards: Mapped[List["UserCard"]] = relationship(back_populates="user", passive_deletes=True)
+
+    def to_read_model(self) -> UsersDTO:
+        return UsersDTO.model_validate(self, from_attributes=True)
+
 
 class Roadmap(Base):
     __tablename__ = 'roadmaps'
@@ -40,13 +45,13 @@ class Roadmap(Base):
         view_only = "view only"
         can_edit = "can edit"
     
-    roadmap_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
 
     title: Mapped[str] = mapped_column(String(256), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
-    difficulty: Mapped[DifficultyEnum] = mapped_column(Enum(DifficultyEnum), nullable=False)
     
+    difficulty: Mapped[DifficultyEnum] = mapped_column(Enum(DifficultyEnum), nullable=False)
     edit_permission: Mapped[EditPermissionEnum] = mapped_column(Enum(EditPermissionEnum), nullable=False)
     visibility: Mapped[VisibilityEnum] = mapped_column(Enum(VisibilityEnum), nullable=False)
     
@@ -57,11 +62,14 @@ class Roadmap(Base):
     cards: Mapped[List["Card"]] = relationship(back_populates="roadmap", passive_deletes=True)
     users: Mapped[List["UserRoadmap"]] = relationship(back_populates="roadmap", passive_deletes=True)
 
+    def to_read_model(self) -> RoadmapDTO:
+        return RoadmapDTO.model_validate(self, from_attributes=True)
+    
 class Card(Base):
     __tablename__ = 'cards'
     
-    card_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    roadmap_id: Mapped[int] = mapped_column(Integer, ForeignKey('roadmaps.roadmap_id', ondelete="CASCADE"), nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    roadmap_id: Mapped[int] = mapped_column(Integer, ForeignKey('roadmaps.id', ondelete="CASCADE"), nullable=False)
     order_position: Mapped[int] = mapped_column(Integer, nullable=False)
     title: Mapped[str] = mapped_column(String(256), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text)
@@ -78,15 +86,23 @@ class Card(Base):
         UniqueConstraint('roadmap_id', 'order_position', name='uq_roadmap_card_position'),
     )
 
+    def to_read_model(self) -> CardDTO:
+        return CardDTO.model_validate(self, from_attributes=True)
+    
+
 class UserRoadmap(Base):
     __tablename__ = 'user_roadmaps'
     
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.user_id', ondelete="CASCADE"), primary_key=True)
-    roadmap_id: Mapped[int] = mapped_column(Integer, ForeignKey('roadmaps.roadmap_id', ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
+    roadmap_id: Mapped[int] = mapped_column(Integer, ForeignKey('roadmaps.id', ondelete="CASCADE"), primary_key=True)
     background: Mapped[str] = mapped_column(String, nullable=False, server_default=text(f"'{settings.DEFAULT_BACKGROUND}'"))
     
     user: Mapped["User"] = relationship(back_populates="roadmaps", passive_deletes=True)
     roadmap: Mapped["Roadmap"] = relationship(back_populates="users", passive_deletes=True)
+
+    def to_read_model(self) -> UserRoadmapDTO:
+        return UserRoadmapDTO.model_validate(self, from_attributes=True)
+    
 
 class UserCard(Base):
     __tablename__ = 'user_cards'
@@ -96,19 +112,27 @@ class UserCard(Base):
         done = "done"
         to_do = "to do"
     
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.user_id', ondelete="CASCADE"), primary_key=True)
-    card_id: Mapped[int] = mapped_column(Integer, ForeignKey('cards.card_id', ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
+    card_id: Mapped[int] = mapped_column(Integer, ForeignKey('cards.id', ondelete="CASCADE"), primary_key=True)
     status: Mapped[StatusEnum] = mapped_column(Enum(StatusEnum), nullable=False, server_default=text("'to_do'"))
     
     user: Mapped["User"] = relationship(back_populates="cards", passive_deletes=True)
     card: Mapped["Card"] = relationship(back_populates="users", passive_deletes=True)
 
+    def to_read_model(self) -> UserCardDTO:
+        return UserCardDTO.model_validate(self, from_attributes=True)
+    
+
 class CardLink(Base):
     __tablename__ = 'card_links'
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    card_id: Mapped[int] = mapped_column(Integer, ForeignKey('cards.card_id', ondelete="CASCADE"), nullable=False)
+    card_id: Mapped[int] = mapped_column(Integer, ForeignKey('cards.id', ondelete="CASCADE"), nullable=False)
     link_title: Mapped[Optional[str]] = mapped_column(String(256))
     link_content: Mapped[Optional[str]] = mapped_column(String)
     
     card: Mapped["Card"] = relationship(back_populates="links", passive_deletes=True)
+
+    def to_read_model(self) -> CardLinkDTO:
+        return CardLinkDTO.model_validate(self, from_attributes=True)
+    

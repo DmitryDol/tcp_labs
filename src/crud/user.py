@@ -1,3 +1,4 @@
+from sqlalchemy import insert, select
 from src.database import async_session_factory
 from src.models import User
 import asyncio
@@ -5,10 +6,25 @@ from faker import Faker
 from src.dto import UsersDTO
 
 
-class UserService:
+class User:
 
     @staticmethod
-    async def add_user(data: list[User]):
+    async def add_user(user: User) -> None:
+        """
+        Adds a list of User objects to the database.
+        Args:
+            user: A User object to be added to the database.
+        Returns:
+            None
+        """
+        async with async_session_factory() as session:
+            stmt = insert(User).values(**user)
+            res = await session.execute(stmt)
+            await session.commit()
+            return res
+
+    @staticmethod
+    async def add_users(data: list[User]) -> None:
         """
         Adds a list of User objects to the database.
         Args:
@@ -16,13 +32,12 @@ class UserService:
         Returns:
             None
         """
-
         async with async_session_factory() as session:
             session.add_all(data)
             await session.commit()
 
     @staticmethod
-    async def delete_user(user_id: int):
+    async def delete_user(user_id: int) -> None:
         """
         Deletes a user from the database by their user ID.
         Args:
@@ -30,7 +45,6 @@ class UserService:
         Returns:
             None   
         """
-
         async with async_session_factory() as session:
             user = await session.get(User, user_id)
             if user: 
@@ -38,7 +52,7 @@ class UserService:
                 await session.commit()
 
     @staticmethod
-    async def update_user(user_id: int, **params):
+    async def update_user(user_id: int, **params) -> None:
         """
         Updates the attributes of a user in the database.
         Args:
@@ -51,7 +65,6 @@ class UserService:
         Returns:
             None
         """
-
         async with async_session_factory() as session:
             user = await session.get(User, user_id)
             if user:
@@ -60,7 +73,7 @@ class UserService:
             await session.commit() 
 
     @staticmethod
-    async def get_user_info(user_id: int):
+    async def get_user_info(user_id: int) -> UsersDTO:
         """
         Returns user information based on the provided user ID.
         Args:
@@ -68,35 +81,20 @@ class UserService:
         Returns:
             UsersDTO: A data transfer object containing the user's information.
         """
-
         async with async_session_factory() as session:
             user = await session.get(User, user_id)
             user_dto = UsersDTO.model_validate(user, from_attributes=True)
             return user_dto
+        
+    @staticmethod
+    async def get_user_info_by_login(login: str) -> UsersDTO | None:
+        async with async_session_factory() as session:
+            stmt = select(User).where(User.login == login)
+            result = await session.execute(stmt)
+            user = result.scalar_one_or_none()
 
-
-
-if __name__ == "__main__":
-
-    # Пример с добавлением
-    fake = Faker('en_US')
-    data = []
-    for _ in range(5):
-        name = fake.name() 
-        user = User(
-            name=name, 
-            login=name.lower().replace(" ", "_")+'@gmail.com',
-            password_hash = fake.password(),
-        )
-        data.append(user)
-    asyncio.run(UserService.add_user(data))
-
-    # Пример с удалением
-    # asyncio.run(delete_user(5))
-
-    # Получение информации о пользователе DTO
-    # user = asyncio.run(UserService.get_user_info(3))
-    # print(user)
-
-    # Пример с обновлением
-    # asyncio.run(UserService.update_user(4, name="Ivan Ivanov", login="ivanov@gmail.com"))
+            if user is None:
+                return None
+            
+            user_dto = UsersDTO.model_validate(user, from_attributes=True)
+            return user_dto

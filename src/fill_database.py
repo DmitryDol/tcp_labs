@@ -1,4 +1,4 @@
-from db_services import *
+from src.crud import *
 from src.models import *
 import asyncio
 from faker import Faker
@@ -17,7 +17,7 @@ async def main():
             password_hash = hash_password(fake.password()),
         )
         data.append(user)
-    await UserService.add_user(data)
+    await User.add_user(data)
     data = [
         Roadmap(
         title="Алгоритмы и структуры данных",
@@ -36,7 +36,7 @@ async def main():
         visibility=Roadmap.VisibilityEnum.link_only
     ) 
     ]
-    await RoadmapService.add_roadmap(data)
+    await Roadmap.add_roadmap(data)
 
     data = [
         Card(
@@ -76,7 +76,7 @@ async def main():
             order_position=3
             )
     ]
-    await CardService.add_card(data)
+    await Card.add_card(data)
 
     data = [
         UserRoadmap(
@@ -88,7 +88,7 @@ async def main():
             roadmap_id=2
         ) 
     ]
-    await UserRoadmapService.add_user_roadmap(data)
+    await UserRoadmap.add_user_roadmap(data)
 
     data = [
         UserCard(
@@ -116,7 +116,7 @@ async def main():
             card_id=6,
         )
     ]
-    await UserCardService.add_user_card(data)
+    await UserCard.add_user_card(data)
 
     data = [
         CardLink(
@@ -146,6 +146,6 @@ async def main():
         ),
         
     ]
-    await CardLinkService.add_card_link(data)
+    await CardLink.add_card_link(data)
 
 asyncio.run(main())
