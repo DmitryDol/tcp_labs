@@ -90,3 +90,9 @@ class CardLinkEditDTO(BaseModel):
     id: int
     link_title: str
     link_content: str
+
+class CardExtendedDTO(CardDTO):
+    links: list[CardLinkDTO]
+
+class RoadmapExtendedDTO(RoadmapDTO):
+    cards: list[CardExtendedDTO]
