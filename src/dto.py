@@ -42,7 +42,7 @@ class RoadmapEditDTO(BaseModel):
 class CardAddDTO(BaseModel):
     roadmap_id: int
     title: str
-    description: str
+    description: Optional[str]
     order_position: int
 
 class CardDTO(CardAddDTO):
