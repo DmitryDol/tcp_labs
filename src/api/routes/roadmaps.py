@@ -5,7 +5,7 @@ from dto import RoadmapAddDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLink
 from api.dependencies import UOWDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
-from services.card_links import card_linksService
+from services.card_links import CardLinksService
 
 router = APIRouter(
     prefix="/roadmaps", 
@@ -131,7 +131,7 @@ async def delete_card_link(
     card_link_id: Annotated[int, Path(title="Link id")],
     uow: UOWDep
 ):
-    await card_linksService.delete_card_link(uow, card_link_id)
+    await CardLinksService.delete_card_link(uow, card_link_id)
 
 @router.patch("/{roadmap_id}/cards/{card_id}/card_links/{card_link_id}")
 async def edit_card_link(
@@ -141,7 +141,7 @@ async def edit_card_link(
     card_link: CardLinkEditDTO,
     uow: UOWDep
 ):
-    await card_linksService.edit_card_link(uow, card_link_id, card_link)
+    await CardLinksService.edit_card_link(uow, card_link_id, card_link)
     return {"card_link_id": card_link_id}
 
 
@@ -153,5 +153,5 @@ async def add_card_link(
     uow: UOWDep,
 ):
     card_link.card_id = card_id
-    card_link_id = await CardsService.add_card(uow, card_link)
+    card_link_id = await CardLinksService.add_card_link(uow, card_link)
     return {"card_id": card_link_id}
