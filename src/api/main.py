@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.routes import users, roadmaps
+from api.routes import roadmaps, users
 from config import settings
 
 api_router = APIRouter()

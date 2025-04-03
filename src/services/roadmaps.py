@@ -1,5 +1,6 @@
+import enum
 from api.routes import roadmaps
-from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO
+from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO
 from utils.unitofwork import IUnitOfWork
 from typing import List, Optional, Dict, Any
 
@@ -11,7 +12,8 @@ class RoadmapsService:
         async with uow:
             roadmap_id = await uow.roadmaps.add_one(roadmap_dict)
             await uow.commit()
-            return roadmap_id
+            owner_id = RoadmapsService.get_roadmap(roadmap_id).owner_id
+            return roadmap_id, owner_id
 
     @staticmethod
     async def edit_roadmap(uow: IUnitOfWork, roadmap_id: int , roadmap: RoadmapEditDTO):
@@ -21,10 +23,24 @@ class RoadmapsService:
             await uow.commit()
 
     @staticmethod
-    async def get_roadmaps(uow: IUnitOfWork, filter_by: Optional[Dict[str, Any]] = None):
+    async def get_roadmap(uow: IUnitOfWork, filter_by: Optional[Dict[str, Any]] = None) -> RoadmapDTO:
         async with uow:
-            roadmaps = await uow.roadmaps.find_all(filter_by)
+            roadmaps = await uow.roadmaps.find_one({"id": filter_by})
             return roadmaps
+        
+    @staticmethod
+    async def get_roadmap_extended(uow: IUnitOfWork, roadmap_id: int):
+        async with uow:
+            roadmap = await uow.roadmaps.find_one({"id": roadmap_id})
+            cards = await uow.cards.find_all({"roadmap_id": roadmap_id})
+            roadmap_dict = roadmap.model_dump()
+            roadmap_dict["cards"] = cards.model_dump()
+            for i, card in enumerate(cards, start=0):
+                card_links = await uow.card_links.find_all({"card_id": card.id})
+                roadmap_dict["cards"][i]["card_links"] = card_links
+            extended_roadmap = RoadmapExtendedDTO.model_validate(roadmap_dict, from_attributes=True)
+            return extended_roadmap
+
 
     @staticmethod
     async def get_public_roadmaps(
