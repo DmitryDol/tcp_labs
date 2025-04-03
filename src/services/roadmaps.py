@@ -1,8 +1,10 @@
 import enum
 from api.routes import roadmaps
 from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO, UserRoadmapEditDTO
+from services.cards import CardsService
 from utils.unitofwork import IUnitOfWork
 from typing import List, Optional, Dict, Any
+# from 
 
 
 class RoadmapsService:
@@ -32,12 +34,10 @@ class RoadmapsService:
     async def get_roadmap_extended(uow: IUnitOfWork, roadmap_id: int):
         async with uow:
             roadmap = await uow.roadmaps.find_one({"id": roadmap_id})
-            cards = await uow.cards.find_all({"roadmap_id": roadmap_id})
             roadmap_dict = roadmap.model_dump()
-            roadmap_dict["cards"] = cards.model_dump()
+            cards = await uow.cards.find_all({"roadmap_id": roadmap_id})
             for i, card in enumerate(cards, start=0):
-                card_links = await uow.card_links.find_all({"card_id": card.id})
-                roadmap_dict["cards"][i]["links"] = card_links
+                roadmap_dict["cards"][i] = CardsService.get_card_extended(uow, card.card_id)
             extended_roadmap = RoadmapExtendedDTO.model_validate(roadmap_dict, from_attributes=True)
             return extended_roadmap
 
