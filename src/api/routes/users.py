@@ -44,3 +44,21 @@ async def edit_user(
 ):
     await UsersService.edit_user(uow, user_id, user)
     return {"user_id": user_id}
+
+@router.get("/{user_id}/roadmaps")
+async def get_linked_roadmaps(
+    user_id: Annotated[int, Path(title="User id")],
+    search: str,
+    difficulty: str,
+    uow: UOWDep,
+    limit: int = 0
+):
+    roadmaps = await UsersService.get_linked_roadmaps(
+        uow=uow, 
+        search=search, 
+        difficulty=difficulty, 
+        limit=limit, 
+        user_id=user_id
+    )
+
+    return roadmaps

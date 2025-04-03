@@ -1,7 +1,7 @@
 from dto import CardLinkAddDTO, CardLinkEditDTO
 from utils.unitofwork import IUnitOfWork
 
-class card_linksService:
+class CardLinksService:
     @staticmethod
     async def add_card_link(uow: IUnitOfWork, card_link: CardLinkAddDTO):
         card_link_dict = card_link.model_dump()

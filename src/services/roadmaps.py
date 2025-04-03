@@ -1,6 +1,6 @@
 import enum
 from api.routes import roadmaps
-from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO
+from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO, UserRoadmapEditDTO
 from utils.unitofwork import IUnitOfWork
 from typing import List, Optional, Dict, Any
 
@@ -41,7 +41,6 @@ class RoadmapsService:
             extended_roadmap = RoadmapExtendedDTO.model_validate(roadmap_dict, from_attributes=True)
             return extended_roadmap
 
-
     @staticmethod
     async def get_public_roadmaps(
         uow: IUnitOfWork, 
@@ -67,7 +66,16 @@ class RoadmapsService:
                 difficulty=difficulty, 
                 limit=limit
             )
-            return roadmaps
+            simplified_roadmaps = [
+                {
+                    "roadmap_id": roadmap.id,
+                    "title": roadmap.title,
+                    "description": roadmap.description,
+                    "difficulty": roadmap.difficulty.value if hasattr(roadmap.difficulty, 'value') else roadmap.difficulty
+                }
+                for roadmap in roadmaps
+            ]
+            return simplified_roadmaps
         
     @staticmethod
     async def delete_roadmap(uow: IUnitOfWork, roadmap_id: int):
@@ -75,3 +83,17 @@ class RoadmapsService:
             roadmap = await uow.roadmaps.delete_one(roadmap_id)
             await uow.commit()
             return roadmap
+        
+    @staticmethod
+    async def link_user_to_roadmap(uow: IUnitOfWork, roadmap_id: int, user_id: int):
+        async with uow:
+            await uow.user_roadmaps.add_one({"roadmap_id": roadmap_id, "user_id": user_id})
+            await uow.commit()
+
+    @staticmethod
+    async def change_background(uow: IUnitOfWork, roadmap_id: int, user_id: int, background: UserRoadmapEditDTO):
+        async with uow:
+            await uow.user_roadmaps.edit_one(
+                id_or_filter={"roadmap_id": roadmap_id, "user_id": user_id},
+                data=background
+            )

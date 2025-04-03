@@ -1,9 +1,10 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
-from dto import RoadmapAddDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO
+from dto import RoadmapAddDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, UserRoadmapEditDTO
 from api.dependencies import UOWDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
+from services.user_roadmaps import UserRoadmapsService
 
 router = APIRouter(
     prefix="/roadmaps", 
@@ -60,6 +61,7 @@ async def edit_card(
 ):
     await CardsService.edit_card(uow, card_id, card)
     return {"card_id": card_id}
+
 @router.post("")
 async def add_roadmap(
     roadmap: RoadmapAddDTO,
@@ -91,3 +93,29 @@ async def delete_roadmap(
     uow: UOWDep
 ):
     await RoadmapsService.delete_roadmap(uow, roadmap_id)
+
+@router.post("/{roadmap_id}/link")
+async def link_user_to_roadmap(
+    roadmap_id: Annotated[int, Path(title="Roadmap id")],
+    user_id: int,
+    uow: UOWDep
+):
+    await RoadmapsService.link_user_to_roadmap(uow, roadmap_id, user_id)
+    return {"roadmap_id": roadmap_id, "user_id": user_id}
+
+@router.delete("/{roadmap_id}/users/{user_id}")
+async def delete_user_roadmap_link(
+    roadmap_id: Annotated[int, Path(title="Roadmap id")],
+    user_id: Annotated[int, Path(title="Roadmap id")],
+    uow: UOWDep
+):
+    await UserRoadmapsService.delete_user_roadmap(uow, {"roadmap_id": roadmap_id, "user_id": user_id})
+
+@router.put("/{roadmap_id}/background")
+async def edit_roadmap_background(
+    roadmap_id: Annotated[int, Path(title="Roadmap id")],
+    user_id: int,
+    background: str,
+    uow: UOWDep
+):
+    await RoadmapsService.change_background(uow, roadmap_id, user_id, UserRoadmapEditDTO(background=background))

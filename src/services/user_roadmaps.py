@@ -1,8 +1,9 @@
+from typing import Dict
 from dto import UserRoadmapAddDTO, UserRoadmapEditDTO
 from utils.unitofwork import IUnitOfWork
 
 
-class user_roadmapsService:
+class UserRoadmapsService:
     @staticmethod
     async def add_user_roadmap(uow: IUnitOfWork, user_roadmap: UserRoadmapAddDTO):
         user_roadmap_dict = user_roadmap.model_dump()
@@ -25,7 +26,7 @@ class user_roadmapsService:
             return user_roadmaps
         
     @staticmethod
-    async def delete_user_roadmap(uow: IUnitOfWork, user_roadmap_id: int):
+    async def delete_user_roadmap(uow: IUnitOfWork, user_roadmap_id: Dict[str, int]):
         async with uow:
             user_roadmap = await uow.user_roadmaps.delete_one(user_roadmap_id)
             await uow.commit()

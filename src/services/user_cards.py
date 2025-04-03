@@ -2,7 +2,7 @@ from dto import UserCardAddDTO, UserCardEditDTO
 from utils.unitofwork import IUnitOfWork
 
 
-class user_cardsService:
+class UserCardService:
     @staticmethod
     async def add_user_card(uow: IUnitOfWork, user_card: UserCardAddDTO):
         user_card_dict = user_card.model_dump()
