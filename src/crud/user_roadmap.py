@@ -1,7 +1,7 @@
-from src.database import async_session_factory
-from src.models import UserRoadmap
+from database import async_session_factory
+from models import UserRoadmap
 import asyncio
-from src.dto import UserRoadmapDTO
+from dto import UserRoadmapDTO
 
 
 class UserRoadmap:

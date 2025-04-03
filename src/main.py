@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-from src.api.main import api_router
+from api.main import api_router
 import os
 import sys
 

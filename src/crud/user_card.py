@@ -1,7 +1,7 @@
-from src.database import async_session_factory
-from src.models import UserCard
+from database import async_session_factory
+from models import UserCard
 import asyncio
-from src.dto import UserCardDTO
+from dto import UserCardDTO
 
 
 class UserCard:

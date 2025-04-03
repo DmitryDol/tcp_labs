@@ -1,12 +1,12 @@
 from sqlalchemy import insert, select
-from src.database import async_session_factory
-from src.models import User
+from database import async_session_factory
+from models import User
 import asyncio
 from faker import Faker
-from src.dto import UsersDTO
+from dto import UserDTO
 
 
-class User:
+class Users:
 
     @staticmethod
     async def add_user(user: User) -> None:
@@ -73,7 +73,7 @@ class User:
             await session.commit() 
 
     @staticmethod
-    async def get_user_info(user_id: int) -> UsersDTO:
+    async def get_user_info(user_id: int) -> UserDTO:
         """
         Returns user information based on the provided user ID.
         Args:
@@ -83,11 +83,11 @@ class User:
         """
         async with async_session_factory() as session:
             user = await session.get(User, user_id)
-            user_dto = UsersDTO.model_validate(user, from_attributes=True)
+            user_dto = UserDTO.model_validate(user, from_attributes=True)
             return user_dto
         
     @staticmethod
-    async def get_user_info_by_login(login: str) -> UsersDTO | None:
+    async def get_user_info_by_login(login: str) -> UserDTO | None:
         async with async_session_factory() as session:
             stmt = select(User).where(User.login == login)
             result = await session.execute(stmt)
@@ -96,5 +96,5 @@ class User:
             if user is None:
                 return None
             
-            user_dto = UsersDTO.model_validate(user, from_attributes=True)
+            user_dto = UserDTO.model_validate(user, from_attributes=True)
             return user_dto

@@ -1,8 +1,8 @@
 from sqlalchemy import text, insert
-from src.database import async_session_factory, async_engine
-from src.models import CardLink
+from database import async_session_factory, async_engine
+from models import CardLink
 import asyncio
-from src.dto import CardLinkDTO
+from dto import CardLinkDTO
 
 
 class CardLink:

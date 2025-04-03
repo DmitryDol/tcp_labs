@@ -1,7 +1,7 @@
-from src.database import async_session_factory
-from src.models import Roadmap
+from database import async_session_factory
+from models import Roadmap
 import asyncio
-from src.dto import RoadmapDTO
+from dto import RoadmapDTO
 
 
 class Roadmap:

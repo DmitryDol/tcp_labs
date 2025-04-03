@@ -1,6 +1,6 @@
 from sqlalchemy import text, insert, inspect
-from src.models import *
-from src.database import async_engine, async_session_factory
+from models import *
+from database import async_engine, async_session_factory
 
 
 class AsyncORM:

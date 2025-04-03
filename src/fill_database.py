@@ -1,8 +1,13 @@
-from src.crud import *
-from src.models import *
+import crud.card
+import crud.card_link
+import crud.roadmap
+import crud.user
+import crud.user_card
+import crud.user_roadmap
+from models import *
 import asyncio
 from faker import Faker
-from src.utils import hash_password
+from utils import hash_password
 
 
 async def main():
@@ -17,7 +22,7 @@ async def main():
             password_hash = hash_password(fake.password()),
         )
         data.append(user)
-    await User.add_user(data)
+    await crud.user.Users.add_users(data)
     data = [
         Roadmap(
         title="Алгоритмы и структуры данных",
@@ -36,7 +41,7 @@ async def main():
         visibility=Roadmap.VisibilityEnum.link_only
     ) 
     ]
-    await Roadmap.add_roadmap(data)
+    await crud.roadmap.Roadmap.add_roadmap(data)
 
     data = [
         Card(
@@ -76,7 +81,7 @@ async def main():
             order_position=3
             )
     ]
-    await Card.add_card(data)
+    await crud.card.Card.add_card(data)
 
     data = [
         UserRoadmap(
@@ -88,7 +93,7 @@ async def main():
             roadmap_id=2
         ) 
     ]
-    await UserRoadmap.add_user_roadmap(data)
+    await crud.user_roadmap.UserRoadmap.add_user_roadmap(data)
 
     data = [
         UserCard(
@@ -116,7 +121,7 @@ async def main():
             card_id=6,
         )
     ]
-    await UserCard.add_user_card(data)
+    await crud.user_card.UserCard.add_user_card(data)
 
     data = [
         CardLink(
@@ -146,6 +151,6 @@ async def main():
         ),
         
     ]
-    await CardLink.add_card_link(data)
+    await crud.card_link.CardLink.add_card_link(data)
 
 asyncio.run(main())

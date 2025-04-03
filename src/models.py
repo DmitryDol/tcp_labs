@@ -1,8 +1,8 @@
 from sqlalchemy import String, Text, ForeignKey, Enum, Integer, DateTime, UniqueConstraint, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 from typing import Optional, List
-from src.config import settings
-from src.dto import *
+from config import settings
+from dto import *
 import enum
 
 
@@ -24,8 +24,8 @@ class User(Base):
     roadmaps: Mapped[List["UserRoadmap"]] = relationship(back_populates="user", passive_deletes=True)
     cards: Mapped[List["UserCard"]] = relationship(back_populates="user", passive_deletes=True)
 
-    def to_read_model(self) -> UsersDTO:
-        return UsersDTO.model_validate(self, from_attributes=True)
+    def to_read_model(self) -> UserDTO:
+        return UserDTO.model_validate(self, from_attributes=True)
 
 
 class Roadmap(Base):

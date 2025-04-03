@@ -1,9 +1,11 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
-from queries.orm import User
-from services import UserService
-from src import crud
-from src.database import async_session_factory
+from typing import Annotated, Optional
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
+from dto import UserAddDTO, UserEditDTO
+from api.dependencies import UOWDep
+#from queries.orm import User
+from services.users import UsersService
+#from src import crud
+from database import async_session_factory
 
 router = APIRouter(
     prefix="/users", 
@@ -11,8 +13,37 @@ router = APIRouter(
 )
 
 
-@router.post("/")
+@router.post("")
 async def add_user(
-    user: User,
-    users_service: Annotated[UserService, Depends(users_service)],
+    user: UserAddDTO,
+    uow: UOWDep,
+):
+    user_id = await UsersService.add_user(uow, user)
+    return {"user_id": user_id}
+
+@router.get("/{user_id}")
+async def get_user_info(
+    user_id: Annotated[int, Path(title="User id")],
+    uow: UOWDep
+):
+    user = await UsersService.get_users(uow=uow, filter_by=user_id)
+    return user
+
+@router.delete(
+        "",
+        status_code=204
 )
+async def delete_user(
+    user_id: int,
+    uow: UOWDep
+):
+    await UsersService.delete_user(uow, user_id)
+
+@router.patch("/{user_id}")
+async def edit_user(
+    user_id: int,
+    user: UserEditDTO,
+    uow: UOWDep
+):
+    await UsersService.edit_user(uow, user_id, user)
+    return {"user_id": user_id}

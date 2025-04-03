@@ -1,20 +1,23 @@
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel
 
 class UserAddDTO(BaseModel):
     name: str
     login: str
     password_hash: str
-    avatar: str
 
-class UserDTO(UserAddDTO):
+class UserDTO(BaseModel):
     id: int
+    name: str
+    login: str
     created_at: datetime
+    avatar: str
 
 class UserEditDTO(BaseModel):
-    id: int
-    password_hash: str
-    avatar: str
+    name: Optional[str] = None
+    password_hash: Optional[str] = None
+    avatar: Optional[str] = None
 
 class RoadmapAddDTO(BaseModel):
     owner_id: int
@@ -30,12 +33,11 @@ class RoadmapDTO(RoadmapAddDTO):
     updated_at: datetime
 
 class RoadmapEditDTO(BaseModel):
-    id: int
-    title: str
-    description: str
-    difficulty: str
-    edit_permission: str
-    visibility: str
+    title: Optional[str]
+    description: Optional[str]
+    difficulty: Optional[str]
+    edit_permission: Optional[str]
+    visibility: Optional[str]
    
 class CardAddDTO(BaseModel):
     roadmap_id: int
@@ -49,10 +51,9 @@ class CardDTO(CardAddDTO):
     updated_at: datetime
 
 class CardEditDTO(BaseModel):
-    id: int
-    title: str
-    description: str
-    order_position: int    
+    title: Optional[str]
+    description: Optional[str]
+    order_position: Optional[int]
 
 class UserRoadmapAddDTO(BaseModel):
     user_id: int
@@ -62,8 +63,6 @@ class UserRoadmapDTO(UserRoadmapAddDTO):
     background: str
 
 class UserRoadmapEditDTO(BaseModel):
-    user_id: int
-    roadmap_id: int
     background: str
 
 class UserCardAddDTO(BaseModel):
@@ -74,8 +73,6 @@ class UserCardDTO(UserCardAddDTO):
     status: str
 
 class UserCardEditDTO(BaseModel):
-    user_id: int
-    card_id: int
     status: str
 
 class CardLinkAddDTO(BaseModel):
@@ -87,9 +84,8 @@ class CardLinkDTO(CardLinkAddDTO):
     id: int
 
 class CardLinkEditDTO(BaseModel):
-    id: int
-    link_title: str
-    link_content: str
+    link_title: Optional[str]
+    link_content: Optional[str]
 
 class CardExtendedDTO(CardDTO):
     links: list[CardLinkDTO]

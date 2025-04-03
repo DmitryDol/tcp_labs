@@ -1,5 +1,5 @@
-from src.models import UserCard
-from src.utils.repository import SQLAlchemyRepository
+from models import UserCard
+from utils.repository import SQLAlchemyRepository
 
 class UserCardRepository(SQLAlchemyRepository):
     model = UserCard
