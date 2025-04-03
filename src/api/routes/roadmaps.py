@@ -1,9 +1,10 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
-from dto import RoadmapAddDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO
+from dto import RoadmapAddDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO
 from api.dependencies import UOWDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
+from services.card_links import card_linksService
 
 router = APIRouter(
     prefix="/roadmaps", 
@@ -37,7 +38,7 @@ async def get_card_info(
     card_id: Annotated[int, Path(title="Card id")],
     uow: UOWDep
 ):
-    card = await CardsService.get_cards(uow=uow, filter_by=card_id)
+    card = await CardsService.get_card_extended(uow, card_id)
     return card
 
 @router.delete(
@@ -91,3 +92,38 @@ async def delete_roadmap(
     uow: UOWDep
 ):
     await RoadmapsService.delete_roadmap(uow, roadmap_id)
+
+@router.delete(
+        "/{roadmap_id}/cards/{card_id}/card_links/{card_link_id}",
+        status_code=204
+)
+async def delete_card_link(
+    roadmap_id: Annotated[int, Path(title="Roadmap id")],
+    card_id: Annotated[int, Path(title="Card id")],
+    card_link_id: Annotated[int, Path(title="Link id")],
+    uow: UOWDep
+):
+    await card_linksService.delete_card_link(uow, card_link_id)
+
+@router.patch("/{roadmap_id}/cards/{card_id}/card_links/{card_link_id}")
+async def edit_card_link(
+    roadmap_id: Annotated[int, Path(title="Roadmap id")],
+    card_id: Annotated[int, Path(title="Card id")],
+    card_link_id: Annotated[int, Path(title="Link id")],
+    card_link: CardLinkEditDTO,
+    uow: UOWDep
+):
+    await card_linksService.edit_card_link(uow, card_link_id, card_link)
+    return {"card_link_id": card_link_id}
+
+
+@router.post("/{roadmap_id}/cards/{card_id}/card_links")
+async def add_card_link(
+    roadmap_id: Annotated[int, Path(title="Roadmap id")],
+    card_id: Annotated[int, Path(title="Card id")],
+    card_link: CardLinkAddDTO,
+    uow: UOWDep,
+):
+    card_link.card_id = card_id
+    card_link_id = await CardsService.add_card(uow, card_link)
+    return {"card_id": card_link_id}
