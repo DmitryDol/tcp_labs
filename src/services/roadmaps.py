@@ -37,7 +37,7 @@ class RoadmapsService:
             roadmap_dict["cards"] = cards.model_dump()
             for i, card in enumerate(cards, start=0):
                 card_links = await uow.card_links.find_all({"card_id": card.id})
-                roadmap_dict["cards"][i]["card_links"] = card_links
+                roadmap_dict["cards"][i]["links"] = card_links
             extended_roadmap = RoadmapExtendedDTO.model_validate(roadmap_dict, from_attributes=True)
             return extended_roadmap
 
