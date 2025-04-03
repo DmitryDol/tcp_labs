@@ -37,7 +37,7 @@ class CardsService:
             card = await uow.cards.find_one(id = card_id)
             card_dict = card.model_dump()
             card_links = await uow.card_links.find_all({"card_id": card.id})
-            card_dict["links"] = []
+            card_dict["links"] = [None]
             for i, card_link in enumerate(card_links, start=0):
                 card_dict["links"][i] = card_link.model_dump()
             extended_card = CardExtendedDTO.model_validate(card_dict, from_attributes=True)
