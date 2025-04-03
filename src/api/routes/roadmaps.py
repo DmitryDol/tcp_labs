@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
 from dto import RoadmapAddDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO
-=======
-from typing import Annotated
-from fastapi import APIRouter, Path
-from dto import RoadmapAddDTO, RoadmapEditDTO
->>>>>>> 560fd71992f487f17c2d0c6ab9228cbd16038261
 from api.dependencies import UOWDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
