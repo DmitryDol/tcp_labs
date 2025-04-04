@@ -22,7 +22,7 @@ class UsersService:
     @staticmethod
     async def get_user(uow: IUnitOfWork, filter_by: Optional[Dict[str, Any]] = None):
         async with uow:
-            users = await uow.users.find_one({"id": filter_by})
+            users = await uow.users.find_one(id=filter_by)
             return users
 
     @staticmethod

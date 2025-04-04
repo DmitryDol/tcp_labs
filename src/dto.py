@@ -33,11 +33,11 @@ class RoadmapDTO(RoadmapAddDTO):
     updated_at: datetime
 
 class RoadmapEditDTO(BaseModel):
-    title: Optional[str]
-    description: Optional[str]
-    difficulty: Optional[str]
-    edit_permission: Optional[str]
-    visibility: Optional[str]
+    title: Optional[str] = None
+    description: Optional[str] = None
+    difficulty: Optional[str] = None
+    edit_permission: Optional[str] = None
+    visibility: Optional[str] = None
    
 class CardAddDTO(BaseModel):
     roadmap_id: int
@@ -88,7 +88,7 @@ class CardLinkEditDTO(BaseModel):
     link_content: Optional[str]
 
 class CardExtendedDTO(CardDTO):
-    links: list[CardLinkDTO]
+    links: list[Optional[CardLinkDTO]]
 
 class RoadmapExtendedDTO(RoadmapDTO):
-    cards: list[CardExtendedDTO]
+    cards: list[Optional[CardExtendedDTO]]

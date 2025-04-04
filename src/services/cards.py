@@ -34,9 +34,9 @@ class CardsService:
     @staticmethod
     async def get_card_extended(uow: IUnitOfWork, card_id: int):
         async with uow:
-            card = await uow.cards.find_one({"id": card_id})
+            card = await uow.cards.find_one(id=card_id)
             card_dict = card.model_dump()
             card_links = await uow.card_links.find_all({"card_id": card.id})
-            card_dict["links"] = [card_link.model_dumb() for card_link in card_links]
+            card_dict["links"] = [card_link.model_dump() for card_link in card_links]
             extended_card = CardExtendedDTO.model_validate(card_dict, from_attributes=True)
             return extended_card

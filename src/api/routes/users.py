@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, HTTPException, Path
 from dto import UserAddDTO, UserEditDTO
 from api.dependencies import UOWDep
 from services.users import UsersService
@@ -23,7 +23,9 @@ async def get_user_info(
     user_id: Annotated[int, Path(title="User id")],
     uow: UOWDep
 ):
-    user = await UsersService.get_users(uow=uow, filter_by=user_id)
+    user = await UsersService.get_user(uow=uow, filter_by=user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     return user
 
 @router.delete(
@@ -31,7 +33,7 @@ async def get_user_info(
         status_code=204
 )
 async def delete_user(
-    user_id: int,
+    user_id: Annotated[int, Path(title="User id")],
     uow: UOWDep
 ):
     await UsersService.delete_user(uow, user_id)

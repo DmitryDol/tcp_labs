@@ -1,4 +1,6 @@
 import enum
+
+from fastapi import HTTPException
 from api.routes import roadmaps
 from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO, UserRoadmapEditDTO
 from services.cards import CardsService
@@ -14,7 +16,7 @@ class RoadmapsService:
         async with uow:
             roadmap_id = await uow.roadmaps.add_one(roadmap_dict)
             await uow.commit()
-            owner_id = RoadmapsService.get_roadmap(roadmap_id).owner_id
+            owner_id = (await RoadmapsService.get_roadmap(uow, roadmap_id)).owner_id
             return roadmap_id, owner_id
 
     @staticmethod
@@ -25,19 +27,25 @@ class RoadmapsService:
             await uow.commit()
 
     @staticmethod
-    async def get_roadmap(uow: IUnitOfWork, filter_by: Optional[Dict[str, Any]] = None) -> RoadmapDTO:
+    async def get_roadmap(uow: IUnitOfWork, filter_by: int) -> RoadmapDTO:
         async with uow:
-            roadmaps = await uow.roadmaps.find_one({"id": filter_by})
+            roadmaps = await uow.roadmaps.find_one(id=filter_by)
             return roadmaps
         
     @staticmethod
     async def get_roadmap_extended(uow: IUnitOfWork, roadmap_id: int):
         async with uow:
-            roadmap = await uow.roadmaps.find_one({"id": roadmap_id})
+            roadmap = await uow.roadmaps.find_one(id=roadmap_id)
+            
+            if not roadmap:
+                raise HTTPException(status_code=404, detail="Roadmap not found")
+            
             roadmap_dict = roadmap.model_dump()
             cards = await uow.cards.find_all({"roadmap_id": roadmap_id})
+            roadmap_dict["cards"] = []
             for i, card in enumerate(cards, start=0):
-                roadmap_dict["cards"][i] = CardsService.get_card_extended(uow, card.card_id)
+                roadmap_dict["cards"].append(await CardsService.get_card_extended(uow, card.id))
+            print('\n\n\n', roadmap_dict, '\n\n\n')
             extended_roadmap = RoadmapExtendedDTO.model_validate(roadmap_dict, from_attributes=True)
             return extended_roadmap
 

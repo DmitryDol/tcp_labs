@@ -15,9 +15,9 @@ router = APIRouter(
 
 @router.get("")
 async def get_public_roadmaps(
-    search: str,
-    difficulty: str,
     uow: UOWDep,
+    search: Optional[str] = None,
+    difficulty: Optional[str] = None,
     limit: int = 0
 ):
     roadmaps = await RoadmapsService.get_public_roadmaps(uow, search, difficulty, limit)
@@ -88,7 +88,10 @@ async def edit_roadmap(
     await RoadmapsService.edit_roadmap(uow, roadmap_id, roadmap)
     return {"roadmap_id": roadmap_id}
 
-@router.delete("/{roadmap_id}")
+@router.delete(
+        "/{roadmap_id}",
+        status_code=204
+)
 async def delete_roadmap(
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     uow: UOWDep
@@ -104,7 +107,10 @@ async def link_user_to_roadmap(
     await RoadmapsService.link_user_to_roadmap(uow, roadmap_id, user_id)
     return {"roadmap_id": roadmap_id, "user_id": user_id}
 
-@router.delete("/{roadmap_id}/users/{user_id}")
+@router.delete(
+        "/{roadmap_id}/users/{user_id}",
+        status_code=204
+)
 async def delete_user_roadmap_link(
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     user_id: Annotated[int, Path(title="Roadmap id")],
