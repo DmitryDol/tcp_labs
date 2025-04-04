@@ -33,7 +33,7 @@ async def add_card(
     card_id = await CardsService.add_card(uow, card)
     return {"card_id": card_id}
 
-@router.get("/{roadmap_id}/cards/{cars_id}")
+@router.get("/{roadmap_id}/cards/{card_id}")
 async def get_card_info(
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     card_id: Annotated[int, Path(title="Card id")],
@@ -160,4 +160,4 @@ async def add_card_link(
 ):
     card_link.card_id = card_id
     card_link_id = await CardLinksService.add_card_link(uow, card_link)
-    return {"card_id": card_link_id}
+    return {"card_link_id": card_link_id}
