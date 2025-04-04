@@ -3,7 +3,7 @@ services:
     image: postgres:latest
     container_name: tcp-labs-db
     ports:
-      - "5438:5432"
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
