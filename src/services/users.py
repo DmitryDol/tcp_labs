@@ -1,12 +1,14 @@
 from typing import Any, Dict, Optional
 from dto import UserAddDTO, UserEditDTO
 from utils.unitofwork import IUnitOfWork
+from utils.utils import hash_password
 
 
 class UsersService:
     @staticmethod
     async def add_user(uow: IUnitOfWork, user: UserAddDTO):
         user_dict = user.model_dump()
+        user_dict["password_hash"] = hash_password(user_dict["password_hash"])
         async with uow:
             user_id = await uow.users.add_one(user_dict)
             await uow.commit()
