@@ -154,4 +154,4 @@ async def add_card_link(
 ):
     card_link.card_id = card_id
     card_link_id = await CardLinksService.add_card_link(uow, card_link)
-    return {"card_id": card_link_id}
+    return {"card_link_id": card_link_id}
