@@ -81,7 +81,7 @@ async def login_for_access_token(
 
 @router.post(
     '/refresh',
-    responce_model=TokenDTO
+    response_model=TokenDTO
 )
 async def refresh_token(
     response: Response,
