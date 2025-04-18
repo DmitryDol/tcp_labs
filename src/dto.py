@@ -2,6 +2,16 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
+
+class TokenDTO(BaseModel):
+    access_token: str
+    token_type: str
+
+class UserAuthDTO(BaseModel):
+    id: int
+    login: str
+    password_hash: str
+
 class UserAddDTO(BaseModel):
     name: str
     login: str

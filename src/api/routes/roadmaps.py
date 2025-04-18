@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
 from services.user_roadmaps import UserRoadmapsService
 from dto import RoadmapAddDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, UserRoadmapEditDTO
-from api.dependencies import UOWDep
+from api.dependencies import UOWDep, UserDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
 from services.card_links import CardLinksService
@@ -15,6 +15,7 @@ router = APIRouter(
 
 @router.get("")
 async def get_public_roadmaps(
+    user_dep: UserDep,
     uow: UOWDep,
     search: Optional[str] = None,
     difficulty: Optional[str] = None,
@@ -25,6 +26,7 @@ async def get_public_roadmaps(
     
 @router.post("/{roadmap_id}/cards")
 async def add_card(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     card: CardAddDTO,
     uow: UOWDep,
@@ -35,6 +37,7 @@ async def add_card(
 
 @router.get("/{roadmap_id}/cards/{card_id}")
 async def get_card_info(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     card_id: Annotated[int, Path(title="Card id")],
     uow: UOWDep
@@ -47,6 +50,7 @@ async def get_card_info(
         status_code=204
 )
 async def delete_card(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     card_id: int,
     uow: UOWDep
@@ -55,6 +59,7 @@ async def delete_card(
 
 @router.patch("/{roadmap_id}/cards/{card_id}")
 async def edit_card(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     card_id: Annotated[int, Path(title="Card id")],
     card: CardEditDTO,
@@ -65,6 +70,7 @@ async def edit_card(
 
 @router.post("")
 async def add_roadmap(
+    user_dep: UserDep,
     roadmap: RoadmapAddDTO,
     uow: UOWDep
 ):
@@ -73,6 +79,7 @@ async def add_roadmap(
 
 @router.get("/{roadmap_id}")
 async def get_roadmap_info(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     uow: UOWDep
 ):
@@ -81,6 +88,7 @@ async def get_roadmap_info(
 
 @router.patch("/{roadmap_id}")
 async def edit_roadmap(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     roadmap: RoadmapEditDTO,
     uow: UOWDep
@@ -93,6 +101,7 @@ async def edit_roadmap(
         status_code=204
 )
 async def delete_roadmap(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     uow: UOWDep
 ):
@@ -100,18 +109,19 @@ async def delete_roadmap(
 
 @router.post("/{roadmap_id}/link")
 async def link_user_to_roadmap(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
-    user_id: int,
     uow: UOWDep
 ):
-    await RoadmapsService.link_user_to_roadmap(uow, roadmap_id, user_id)
-    return {"roadmap_id": roadmap_id, "user_id": user_id}
+    await RoadmapsService.link_user_to_roadmap(uow, roadmap_id, user_dep['id'])
+    return {"roadmap_id": roadmap_id, "user_id": user_dep['id']}
 
 @router.delete(
         "/{roadmap_id}/users/{user_id}",
         status_code=204
 )
 async def delete_user_roadmap_link(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     user_id: Annotated[int, Path(title="Roadmap id")],
     uow: UOWDep
@@ -120,6 +130,7 @@ async def delete_user_roadmap_link(
 
 @router.put("/{roadmap_id}/background")
 async def edit_roadmap_background(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     user_id: int,
     background: str,
@@ -132,6 +143,7 @@ async def edit_roadmap_background(
         status_code=204
 )
 async def delete_card_link(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     card_id: Annotated[int, Path(title="Card id")],
     card_link_id: Annotated[int, Path(title="Link id")],
@@ -141,6 +153,7 @@ async def delete_card_link(
 
 @router.patch("/{roadmap_id}/cards/{card_id}/card_links/{card_link_id}")
 async def edit_card_link(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     card_id: Annotated[int, Path(title="Card id")],
     card_link_id: Annotated[int, Path(title="Link id")],
@@ -153,6 +166,7 @@ async def edit_card_link(
 
 @router.post("/{roadmap_id}/cards/{card_id}/card_links")
 async def add_card_link(
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     card_id: Annotated[int, Path(title="Card id")],
     card_link: CardLinkAddDTO,

@@ -26,3 +26,8 @@ uv pip install fastapi # Ставим fastapi
 
 uv pip install -r requirements.txt # Установка из requirements.txt
 ```
+
+Обновить requirements.txt
+```
+uv pip freeze | uv pip compile - -o requirements.txt
+```
