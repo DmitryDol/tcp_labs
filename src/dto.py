@@ -7,6 +7,12 @@ class TokenDTO(BaseModel):
     access_token: str
     token_type: str
 
+class TokenBlacklistDTO(BaseModel):
+    id: int
+    token_jti: str
+    revoked_at: datetime
+    expired_at: datetime
+
 class UserAuthDTO(BaseModel):
     id: int
     login: str

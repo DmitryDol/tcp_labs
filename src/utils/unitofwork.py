@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Type
 
 from database import async_session_factory
+from repositories.tokens import TokenRepository
 from repositories.users import UserRepository
 from repositories.roadmaps import RoadmapRepository
 from repositories.cards import CardRepository
@@ -17,6 +18,7 @@ class IUnitOfWork(ABC):
     user_cards: Type[UserCardRepository]
     user_roadmaps: Type[UserRoadmapRepository]
     card_links: Type[CardLinkRepository]
+    tokens: Type[TokenRepository]
     
     @abstractmethod
     def __init__(self):
@@ -52,6 +54,7 @@ class UnitOfWork:
         self.user_cards = UserCardRepository(self.session)
         self.user_roadmaps = UserRoadmapRepository(self.session)
         self.card_links = CardLinkRepository(self.session)
+        self.tokens = TokenRepository(self.session)
 
     async def __aexit__(self, *args):
         await self.rollback()
