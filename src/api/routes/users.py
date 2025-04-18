@@ -46,8 +46,6 @@ async def get_linked_roadmaps(
     search: str,
     difficulty: str,
     uow: UOWDep,
-    search: Optional[str] = None,
-    difficulty: Optional[str] = None,
     limit: Optional[int] = 0
 ):
     roadmaps = await UsersService.get_linked_roadmaps(
