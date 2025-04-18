@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi import APIRouter, HTTPException, Path
 from dto import UserAddDTO, UserEditDTO
 from api.dependencies import UOWDep
@@ -50,10 +50,10 @@ async def edit_user(
 @router.get("/{user_id}/roadmaps")
 async def get_linked_roadmaps(
     user_id: Annotated[int, Path(title="User id")],
-    search: str,
-    difficulty: str,
     uow: UOWDep,
-    limit: int = 0
+    search: Optional[str] = None,
+    difficulty: Optional[str] = None,
+    limit: Optional[int] = 0
 ):
     roadmaps = await UsersService.get_linked_roadmaps(
         uow=uow, 
