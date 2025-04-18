@@ -1,25 +1,18 @@
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Path
 from dto import UserAddDTO, UserEditDTO
-from api.dependencies import UOWDep
+from api.dependencies import UOWDep, UserDep
 from services.users import UsersService
+
 
 router = APIRouter(
     prefix="/users", 
     tags=["users"]
 )
 
-
-@router.post("")
-async def add_user(
-    user: UserAddDTO,
-    uow: UOWDep,
-):
-    user_id = await UsersService.add_user(uow, user)
-    return {"user_id": user_id}
-
 @router.get("/{user_id}")
 async def get_user_info(
+    user_dep: UserDep,
     user_id: Annotated[int, Path(title="User id")],
     uow: UOWDep
 ):
@@ -33,23 +26,23 @@ async def get_user_info(
         status_code=204
 )
 async def delete_user(
-    user_id: Annotated[int, Path(title="User id")],
+    user_dep: UserDep,
     uow: UOWDep
 ):
-    await UsersService.delete_user(uow, user_id)
+    await UsersService.delete_user(uow, user_dep['id'])
 
 @router.patch("/{user_id}")
 async def edit_user(
-    user_id: Annotated[int, Path(title="User id")],
+    user_dep: UserDep,
     user: UserEditDTO,
     uow: UOWDep
 ):
-    await UsersService.edit_user(uow, user_id, user)
-    return {"user_id": user_id}
+    await UsersService.edit_user(uow, user_dep['id'], user)
+    return {"user_id": user_dep['id']}
 
 @router.get("/{user_id}/roadmaps")
 async def get_linked_roadmaps(
-    user_id: Annotated[int, Path(title="User id")],
+    user_dep: UserDep,
     search: str,
     difficulty: str,
     uow: UOWDep,
@@ -60,7 +53,7 @@ async def get_linked_roadmaps(
         search=search, 
         difficulty=difficulty, 
         limit=limit, 
-        user_id=user_id
+        user_id=user_dep['id']
     )
 
     return roadmaps

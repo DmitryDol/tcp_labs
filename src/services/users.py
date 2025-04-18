@@ -1,10 +1,20 @@
-from typing import Any, Dict, Optional
+from typing import Annotated, Any, Dict, Optional
 from dto import UserAddDTO, UserEditDTO
 from utils.unitofwork import IUnitOfWork
-from utils.utils import hash_password
+from utils.utils import hash_password, verify_password
 
 
 class UsersService:
+    @staticmethod
+    async def authenticate_user(uow: IUnitOfWork, login: str, password: str):
+        async with uow:
+            user = await uow.users.find_auth_info(login)
+            if not user:
+                return False
+            if not verify_password(password, user.password_hash):
+                return False
+            return user
+
     @staticmethod
     async def add_user(uow: IUnitOfWork, user: UserAddDTO):
         user_dict = user.model_dump()

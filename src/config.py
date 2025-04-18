@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     DB_NAME: str
     DEFAULT_AVATAR: str
     DEFAULT_BACKGROUND: str
+    SECRET_KEY: str
+    ALGORITHM: str
 
     @property
     def DATABASE_URL_asyncpg(self):
