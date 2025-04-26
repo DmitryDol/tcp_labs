@@ -135,15 +135,3 @@ class CardLink(Base):
 
     def to_read_model(self) -> CardLinkDTO:
         return CardLinkDTO.model_validate(self, from_attributes=True)
-    
-
-class TokenBlacklist(Base):
-    __tablename__ = "token_blacklist"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    token_jti: Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    revoked_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    expires_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False)
-
-    def to_read_model(self) -> TokenBlacklistDTO:
-        return TokenBlacklistDTO.model_validate(self, from_attributes=True)
