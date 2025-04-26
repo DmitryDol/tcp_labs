@@ -1,13 +1,13 @@
-import enum
+import logging
 
 from fastapi import HTTPException
-from api.routes import roadmaps
 from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO, UserRoadmapEditDTO
 from services.cards import CardsService
 from utils.unitofwork import IUnitOfWork
-from typing import List, Optional, Dict, Any
-# from 
+from typing import List, Optional
 
+
+logger = logging.getLogger(__name__)
 
 class RoadmapsService:
     @staticmethod
@@ -43,9 +43,9 @@ class RoadmapsService:
             roadmap_dict = roadmap.model_dump()
             cards = await uow.cards.find_all({"roadmap_id": roadmap_id})
             roadmap_dict["cards"] = []
-            for i, card in enumerate(cards, start=0):
+            for card in cards:
                 roadmap_dict["cards"].append(await CardsService.get_card_extended(uow, card.id))
-            print('\n\n\n', roadmap_dict, '\n\n\n')
+            logger.debug('\n\n\n', roadmap_dict, '\n\n\n')
             extended_roadmap = RoadmapExtendedDTO.model_validate(roadmap_dict, from_attributes=True)
             return extended_roadmap
 
