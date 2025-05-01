@@ -119,7 +119,8 @@ async def refresh_token(
 
     await TokensService.revoke_token(jti, expires_at, redis_dep)
 
-    await TokensService.revoke_token(access_token_jti, access_token_expires_at, redis_dep)
+    if access_token:
+        await TokensService.revoke_token(access_token_jti, access_token_expires_at, redis_dep)
 
     response.set_cookie(
         key="access_token",
