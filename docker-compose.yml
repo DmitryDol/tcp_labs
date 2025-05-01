@@ -1,4 +1,43 @@
 services:
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"   
+      - "9001:9001"   
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+      - minio_config:/root/.minio         
+    command: server /data --console-address ":9001"
+    networks:
+      - storage-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  minio-api:
+    build: ./minio_img_service
+    container_name: minio_img_service
+    ports:
+      - "8080:8080"
+    environment:
+      MINIO_URL: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+      DEFAULT_AVATAR: ${DEFAULT_AVATAR}
+      DEFAULT_BACKGROUND: ${DEFAULT_BACKGROUND}
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - storage-net
+
   postgres:
     image: postgres:latest
     container_name: tcp-labs-db
@@ -7,28 +46,42 @@ services:
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB:  ${DB_NAME}
+      POSTGRES_DB: ${DB_NAME}
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
-      - tcp-labs-db:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - storage-net
 
   redis:
     image: redis:latest
+    container_name: redis
     restart: always
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --save 20 1 --loglevel warning
+    networks:
+      - storage-net
+
+
+networks:
+  storage-net:
+    driver: bridge
 
 volumes:
-  tcp-labs-db:
+  minio_data:
+    driver: local
+  minio_config:
+    driver: local
+  postgres_data:
     driver: local
   redis_data:
     driver: local
