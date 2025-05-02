@@ -71,6 +71,38 @@ services:
     networks:
       - storage-net
 
+  fastapi_app:
+    build: . 
+    container_name: fastapi_app
+    ports:
+      - "8000:8000" 
+    environment:
+      # Redis config
+      REDIS_HOST: redis 
+      REDIS_PORT: 6379
+      REDIS_DB: ${REDIS_DB}
+      # PostgreSQL config
+      DB_HOST: postgres 
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Default images config
+      DEFAULT_AVATAR: ${DEFAULT_AVATAR}
+      DEFAULT_BACKGROUND: ${DEFAULT_BACKGROUND}
+      # jwt config
+      SECRET_KEY: ${SECRET_KEY} 
+      ALGORITHM: ${ALGORITHM} 
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES} 
+      REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS} 
+    depends_on:
+      postgres:
+        condition: service_healthy 
+      redis:
+        condition: service_started 
+    networks:
+      - storage-net
+    restart: always 
 
 networks:
   storage-net:
