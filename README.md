@@ -27,3 +27,18 @@ docker compose exec -w /app fastapi_app alembic upgrade head
 ```
 docker compose exec fastapi_app uv run fill_database.py
 ```
+
+## Swagger и MinIO
+
+[Swagger UI](http://localhost:8080/swagger-ui.html)
+
+[MinIO](http://localhost:9001) (admin/password)
+
+## Endpoints
+
+### MinIO endpoints
+| Метод      | Путь              | Описание               |
+| ---------- | ----------------- | ---------------------- |
+| POST       | /files            | Загрузка файла в MinIO |
+| GET        | /files/{filename} | Получение файла        |
+| DELETE     | /files/{filename} | Удаление файла         |
