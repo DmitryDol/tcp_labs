@@ -8,27 +8,22 @@
 
 [Отчет](https://docs.google.com/document/d/1LPiKWnQ9E7KnppfHBw2JA64IY4K4KiiCK2GvF-Naf_k/edit?usp=sharing)
 
-## ЛР1
+## Запуск backend`а:
 
-In .env file add default UUID values for user avatar (DEFAULT_AVATAR) and roadmap background (DEFAULT_BACKGROUND) from MinIO
+Сборка контейнеров
 
-## ЛР2
+```
+docker compose up -d --build
+```
 
-[alembic tutorial](src/migrations/alembic_tutorial.md)
+Накатить миграции (создать БД)
 
-## ЛР3
+```
+docker compose exec -w /app fastapi_app alembic upgrade head
+```
 
-Переезд с pip на [uv](uv.md), с docker на docker-compose
+Заполнить бд тестовыми данными
 
-### TODO:
-
-* Services:
-  * [X] users (done)
-  * [ ] roadmaps
-  * [ ] cards
-  * [ ] user_cards
-  * [ ] user_roadmaps
-  * [ ] card_links
-* api
-* refactor code (again)
-* Возможно отказаться от updated_at в roadmaps, либо настроить изменение при редактировании карточек у данного роадмапа
+```
+docker compose exec fastapi_app uv run fill_database.py
+```
