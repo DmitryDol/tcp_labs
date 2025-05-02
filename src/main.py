@@ -70,5 +70,5 @@ async def add_process_time_header(request: Request, call_next: Callable):
 
 app.include_router(api_router)
 
-if __name__ == "__main__":
-    uvicorn.run(app="main:app", reload=True)
+# if __name__ == "__main__":
+#     uvicorn.run(app="main:app", reload=True)
