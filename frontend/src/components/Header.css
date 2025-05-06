@@ -1,0 +1,10 @@
+.dropdown-menu.show {
+    background-color: #8a2be2;
+  }
+
+.fixed-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1050; 
+}

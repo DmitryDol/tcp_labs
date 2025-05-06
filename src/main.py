@@ -15,15 +15,18 @@ app = FastAPI(
     title="Сервис для трекинга карьеры"
 )
 
+origins = [
+    "http://localhost:5050",
+    "http://127.0.0.1:5050"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # В production заменить на список конкретных доменов
+    allow_origins=origins,  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 
 app.include_router(api_router)
 

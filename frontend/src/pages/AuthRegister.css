@@ -1,0 +1,14 @@
+.registration-container {
+    background-color: white; 
+    color:black; 
+    padding: 2rem; 
+    border-radius: 10px;
+  }
+  
+  .btn-purple {
+    color: #fff; 
+    background-color:#8a2be2 !important;
+  }
+  .form-control {
+    background-color: #adadad;
+  }
