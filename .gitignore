@@ -172,3 +172,54 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 docker-compose.yml
+
+########## JAVA ##########
+minio_img_service/.gradle
+minio_img_service/build/
+!minio_img_service/gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+*.jar
+*.war
+*.ear
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+.idea/
+minio_img_service/.idea
+minio_img_service/.idea/
+*.iws
+*.iml
+*.ipr
+out/
+minio_img_service/out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+
+
+### Logs ###
+*.log
+logs/
