@@ -16,36 +16,13 @@ const AuthPage = () => {
   };
 
   const handleLogin = async (e) => {
+    // кнопка входа в профиль
     e.preventDefault();
     if (!formData.login || !formData.password) {
       setError("Пожалуйста, заполните оба поля.");
       return;
-    }
-    
-    // const params = new URLSearchParams({
-    //   username: formData.login,
-    //   password: formData.password
-    // }).toString();
-
-    // try {
-    //   await axios.post(
-    //     "http://127.0.0.1:8000/auth/token",
-    //     params,
-    //     { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-    //   );
-      
-      navigate("/mainpage");
-    // } catch (err) {
-    //   alert(
-    //     err.response?.data?.detail ||
-    //     err.message ||
-    //     "Ошибка входа"
-    //   );
-    // }
-  };
-
-  const handleRegister = () => {
-    navigate("/register");
+    }  
+      navigate("/mainpage"); 
   };
 
   return (
@@ -84,7 +61,7 @@ const AuthPage = () => {
               <Button type="submit" className="mt-3 btn-purple flex-grow-1">
                 Войти
               </Button>
-              <Button type="button" className="mt-3 btn-purple flex-grow-1" onClick={handleRegister}>
+              <Button type="button" className="mt-3 btn-purple flex-grow-1" href="/register">
                 Зарегистрироваться
               </Button>
             </div>

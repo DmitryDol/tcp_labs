@@ -1,0 +1,16 @@
+.roadmaps-container {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+.searchbutton{
+  background-color: blueviolet !important;
+}
+.pagination {
+  --bs-pagination-hover-color: blueviolet;
+  --bs-pagination-active-bg: blueviolet;
+}

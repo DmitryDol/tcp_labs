@@ -4,6 +4,7 @@ import AuthPage from "./pages/AuthPage";
 import RegisterPage from "./pages/RegisterPage";
 import MainPage from "./pages/MainPage";
 import EditProfilePage from "./pages/EditProfilePage"
+import RoadmapSearchPage from "./pages/RoadmapSearchPage"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/mainpage" element={<MainPage />} />
         <Route path="/editprofile" element={<EditProfilePage />} />
+        <Route path="/roadmapsearch" element={<RoadmapSearchPage />} />
       </Routes>
     </Router>
   );

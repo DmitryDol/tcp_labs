@@ -21,6 +21,7 @@ const RegisterPage = () => {
   };
 
   const handleSubmit = async (e) => {
+    // обработка создания нового пользователя
     e.preventDefault();
     const { name, username, password } = formData;
     if (!name || !username || !password) {
@@ -37,6 +38,7 @@ const RegisterPage = () => {
         "Content-Type": "application/json",
       },
     });
+    // тут обработку ошибок добавить и только потом переход
     navigate("/mainpage");
   };
 

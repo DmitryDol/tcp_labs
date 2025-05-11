@@ -32,16 +32,16 @@ const EditProfilePage = () => {
     //тут логика удаления аватара
   }
 
-  const handleFileChange = (e) => {
+  const handleNewAvatar = (e) => {
     const file = e.target.files[0];
     if (file) {
-      //тут что то с файлом сделать
+      //тут что то с файлом сделать, сохранение сразу произвести
       console.log(file);
     }
   };
 
   return (
-    <div>
+    <>
       <Header
         showButtons={true}
         avatarUrl={avatarUrl}
@@ -54,8 +54,8 @@ const EditProfilePage = () => {
           </span>
           <div className="user-info">
             {/* тут должно быть имя пользователя который сейчас в системе */}
-            <div>username</div> 
-            <div>login</div>
+            <div>{'username'}</div> 
+            <div>{'login'}</div>
           </div>
         </div>
             <ButtonGroup size="sm">
@@ -65,11 +65,11 @@ const EditProfilePage = () => {
                 accept="image/*"
                 ref={inputRef}
                 style={{ display: 'none' }}
-                onChange={handleFileChange}
+                onChange={handleNewAvatar}
               />
               <Button className="buttongroup" onClick={handleDeleteAvatar}>Удалить аватар</Button>
             </ButtonGroup>
-        <Form className="form" onSubmit={handleSubmit}>
+        <Form className="userinfo-form" onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Изменить имя</Form.Label>
                 <Form.Control
@@ -106,7 +106,7 @@ const EditProfilePage = () => {
           </div>
         </Form>
       </div>
-    </div> 
+    </> 
   );
 };
 

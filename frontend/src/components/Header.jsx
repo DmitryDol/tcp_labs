@@ -26,8 +26,9 @@ const Header = ({ showButtons, avatarUrl}) => {
               <Nav.Link href="/roadmapsearch" className="menu-button">Поиск роадмапов</Nav.Link>
               <NavDropdown title="Профиль" style={{backgroundColor:'#8a2be2'}} id="collapsible-nav-dropdown">
                 <NavDropdown.Item style={{color:'#fff', backgroundColor: '#8a2be2', fontSize:"15px"}}>
-                  <div>Name</div>
-                  <div>login</div>
+                  {/* тут должно быть имя и логин пользователя, который в системе */}
+                  <div>{'Name'}</div>
+                  <div>{'login'}</div>
                 </NavDropdown.Item>
                 <NavDropdown.Item href="/editprofile" style={{color:'#fff', backgroundColor: '#8a2be2'}}>Настройки профиля</NavDropdown.Item>
                 <NavDropdown.Item onClick={handleLogout} style={{color:'#fff', backgroundColor: '#8a2be2'}}>Выйти</NavDropdown.Item>

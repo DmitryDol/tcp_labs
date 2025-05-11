@@ -1,0 +1,53 @@
+@media (max-width: 500px) {
+    body:not(.zoomin) .roadmapcard {
+        width: calc(80% - 1rem);
+        
+    }
+}
+
+@media (min-width: 501px) and (max-width: 999px) {
+    body:not(.zoomin) .roadmapcard {
+        width: calc(80% - 1rem);
+    }
+}
+
+@media (min-width: 1000px) {
+    body:not(.zoomin) .roadmapcard {
+        width: calc(45% - 1rem);
+    }
+}
+
+.roadmapcard{
+    flex-basis: auto;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 100%; 
+    max-width: 60rem; 
+    min-width: 10rem;
+    transition: width 0.3s ease;
+    --bs-bg-opacity:0;
+}
+.roadmapname{
+    color: black;
+    text-decoration: none;
+}
+
+.cardbody{
+    flex: 0 0 auto;
+    background-color: white;
+    width: 70%;
+    border-bottom-left-radius: 6px;
+    border-top-left-radius: 6px;
+}
+.cardimg{ 
+    object-fit: cover;
+    width: 30%;
+    height: 100%;
+    border-radius: 0px 6px 6px 0px;
+}
+
+
+.add-button{
+    --bs-btn-hover-bg: blueviolet ; 
+    --bs-btn-active-bg: blueviolet
+}
