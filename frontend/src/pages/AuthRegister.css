@@ -12,3 +12,7 @@
   .form-control {
     background-color: #adadad;
   }
+  .erroralert{
+    --bs-alert-padding-x: 10px;
+    --bs-alert-padding-y:10px
+  }

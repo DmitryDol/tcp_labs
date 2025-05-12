@@ -8,3 +8,8 @@
   width: 100%;
   z-index: 1050; 
 }
+.dropdownitem{
+  color:#fff; 
+  background-color: #8a2be2;
+  --bs-dropdown-link-active-bg:none;
+}

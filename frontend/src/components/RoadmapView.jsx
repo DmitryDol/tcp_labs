@@ -18,7 +18,7 @@ function RoadmapView({ backgroundUrl, roadmapTitle}) {
           flexDirection: 'row',
           height: '12rem'}}>
         <Card.Body className="cardbody">
-          <Card.Title style={{fontSize: '18px'}}>
+          <Card.Title style={{fontSize: '21px'}}>
             <Card.Link href="/путь-к-странице" className="roadmapname">{roadmapTitle}</Card.Link>
           </Card.Title>
           <Card.Footer style={{display: 'flex', 

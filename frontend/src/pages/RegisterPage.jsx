@@ -11,6 +11,7 @@ const RegisterPage = () => {
     name: "",
     username: "",
     password: "",
+    password2: ""
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -23,12 +24,15 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     // обработка создания нового пользователя
     e.preventDefault();
-    const { name, username, password } = formData;
-    if (!name || !username || !password) {
-      setError("Заполните все поля!");
+    const { name, username, password, password2 } = formData;
+    if (password.length < 6 || password.length > 16){
+      setError("Пароль должен содержать от 6 до 16 символов")
       return;
     }
-  
+    if(password!=password2){
+      setError("Пароли не совпадают")
+      return;
+    }
     await axios.post("http://127.0.0.1:8000/auth", {
       name: name,
       login: username,
@@ -95,7 +99,7 @@ const RegisterPage = () => {
           />
         </Form.Group>
 
-        {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+        {error && <Alert variant="danger" className="mt-3 erroralert">{error}</Alert>}
 
         <div className="d-grid">
           <Button type="submit" className="mt-3 btn-purple">

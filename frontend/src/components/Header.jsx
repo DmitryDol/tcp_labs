@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Navbar, Nav, Container, Button, Dropdown , Image, NavDropdown} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Header.css"
 
 const Header = ({ showButtons, avatarUrl}) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     //тут логика выхода
@@ -21,7 +22,7 @@ const Header = ({ showButtons, avatarUrl}) => {
           {showButtons && (
           <Navbar.Collapse id="responsive-navbar-nav"> 
             <Nav className="me-auto"/>    
-            <Nav>
+            <Nav activeKey={location.pathname}>
             <Nav.Link href="/myroadmaps" className="menu-button">Мои роадмапы</Nav.Link>
               <Nav.Link href="/roadmapsearch" className="menu-button">Поиск роадмапов</Nav.Link>
               <NavDropdown title="Профиль" style={{backgroundColor:'#8a2be2'}} id="collapsible-nav-dropdown">
@@ -30,8 +31,8 @@ const Header = ({ showButtons, avatarUrl}) => {
                   <div>{'Name'}</div>
                   <div>{'login'}</div>
                 </NavDropdown.Item>
-                <NavDropdown.Item href="/editprofile" style={{color:'#fff', backgroundColor: '#8a2be2'}}>Настройки профиля</NavDropdown.Item>
-                <NavDropdown.Item onClick={handleLogout} style={{color:'#fff', backgroundColor: '#8a2be2'}}>Выйти</NavDropdown.Item>
+                <NavDropdown.Item href="/editprofile" className="dropdownitem">Настройки профиля</NavDropdown.Item>
+                <NavDropdown.Item onClick={handleLogout} className="dropdownitem">Выйти</NavDropdown.Item>
               </NavDropdown>
               {avatarUrl && (
                 <Image 

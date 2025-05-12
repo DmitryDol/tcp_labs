@@ -2,13 +2,19 @@ import React, { useState, useRef} from "react";
 import Header from "../components/Header";
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
-import { Form } from "react-bootstrap";
+import { Form, Alert } from "react-bootstrap";
 import './EditProfilePage.css'; 
 
 const avatarUrl = "https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png?ssl=1";
 
 const EditProfilePage = () => {
-  const [formData, setFormData] = useState({});
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    username: "",
+    password: "",
+    password2: ""
+  });
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -19,6 +25,15 @@ const EditProfilePage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const { name, username, password, password2 } = formData;
+    if (password.length < 6 || password.length > 16){
+      setError("Пароль должен содержать от 6 до 16 символов")
+      return;
+    }
+    if(password!=password2){
+      setError("Пароли не совпадают")
+      return;
+    }
     // Здесь логика сохранения изменений
     alert("Изменения сохранены!");
   };
@@ -84,8 +99,8 @@ const EditProfilePage = () => {
                 <Form.Label>Изменить пароль</Form.Label>
                 <Form.Control
                   type="password"
-                  name="password1"
-                  value={formData.password1}
+                  name="password"
+                  value={formData.password}
                   onChange={handleChange}
                   placeholder="Введите новый пароль"
                 />
@@ -99,6 +114,7 @@ const EditProfilePage = () => {
                   placeholder="Повторите пароль"
                 />
               </Form.Group>
+              {error && <Alert variant="danger" className="mt-3 erroralert">{error}</Alert>}
           <div className="d-flex justify-content-center">
             <Button className="button" type="submit">
               Сохранить изменения

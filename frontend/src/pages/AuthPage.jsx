@@ -16,13 +16,10 @@ const AuthPage = () => {
   };
 
   const handleLogin = async (e) => {
-    // кнопка входа в профиль
-    e.preventDefault();
-    if (!formData.login || !formData.password) {
-      setError("Пожалуйста, заполните оба поля.");
-      return;
-    }  
-      navigate("/mainpage"); 
+    // кнопка входа в профиль.Сделать правильную авторизацию
+    // e.preventDefault();
+     
+    navigate("/mainpage"); 
   };
 
   return (
@@ -55,7 +52,7 @@ const AuthPage = () => {
                 required
               />
             </Form.Group>
-            {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+            {error && <Alert variant="danger" className="mt-3 erroralert">{error}</Alert>}
 
             <div className="d-flex justify-content-center gap-2">
               <Button type="submit" className="mt-3 btn-purple flex-grow-1">

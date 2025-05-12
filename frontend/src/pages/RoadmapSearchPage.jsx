@@ -16,7 +16,8 @@ const RoadmapSearchPage = () => {
   for (let i = 0; i < totalRoadmaps; i++) {
     allRoadmaps.push({
       backgroundUrl: i % 2 === 0 ? background : background2,
-      roadmapTitle: `название роадмапа ${i + 1}`
+      // roadmapTitle: `название роадмапа ${i + 1}`
+      roadmapTitle: "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
     });
   }
   const itemsPerPage = 6;
