@@ -1,4 +1,4 @@
-from dto import CardAddDTO, CardEditDTO, CardExtendedDTO
+from dto import CardAddDTO, CardDTO, CardEditDTO, CardExtendedDTO
 from utils.unitofwork import IUnitOfWork
 
 
@@ -23,6 +23,12 @@ class CardsService:
         async with uow:
             cards = await uow.cards.find_all()
             return cards
+        
+    @staticmethod
+    async def get_card(uow: IUnitOfWork, card_id) -> CardDTO:
+        async with uow:
+            card = await uow.cards.find_one(card_id)
+            return CardDTO.model_validate(card, from_attributes=True)
         
     @staticmethod
     async def delete_card(uow: IUnitOfWork, card_id: int):

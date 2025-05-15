@@ -1,7 +1,7 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
 from services.user_roadmaps import UserRoadmapsService
-from dto import RoadmapAddDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, UserRoadmapEditDTO
+from dto import CardExtendedDTO, RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, UserRoadmapEditDTO
 from api.dependencies import UOWDep, UserDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
@@ -15,15 +15,16 @@ router = APIRouter(
 @router.post("")
 async def add_card(
     user_dep: UserDep,
-    roadmap_id: int,
     card: CardAddDTO,
     uow: UOWDep,
 ):
-    card.roadmap_id = roadmap_id
+    roadmap_info: RoadmapDTO = RoadmapsService.get_roadmap(uow, card.roadmap_id)
+    if roadmap_info.owner_id != user_dep['id'] and roadmap_info.edit_permission != "can edit":
+        raise HTTPException(status_code=403, detail='User does not have permission to edit this card.')
     card_id = await CardsService.add_card(uow, card)
     return {"card_id": card_id}
 
-@router.get("/{card_id}")
+@router.get("/{card_id}", response_model=CardExtendedDTO)
 async def get_card_info(
     user_dep: UserDep,
     card_id: Annotated[int, Path(title="Card id")],

@@ -8,7 +8,7 @@ from utils.repository import SQLAlchemyRepository
 class UserRepository(SQLAlchemyRepository):
     model = User
 
-    async def find_auth_info(self, login) -> Optional[Any]:
+    async def find_auth_info(self, login) -> UserAuthDTO:
         """
         Find a single record by filter criteria
         
