@@ -1,6 +1,5 @@
 import logging
 
-from fastapi import HTTPException
 from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO, UserRoadmapEditDTO
 from services.cards import CardsService
 from utils.unitofwork import IUnitOfWork
@@ -27,18 +26,23 @@ class RoadmapsService:
             await uow.commit()
 
     @staticmethod
-    async def get_roadmap(uow: IUnitOfWork, filter_by: int) -> RoadmapDTO:
+    async def get_roadmap(uow: IUnitOfWork, roadmap_id: int) -> RoadmapDTO:
         async with uow:
-            roadmaps = await uow.roadmaps.find_one(id=filter_by)
+            roadmaps = await uow.roadmaps.find_one(id=roadmap_id)
             return roadmaps
+        
+    @staticmethod
+    async def get_roadmaps(uow: IUnitOfWork, roadmap_ids: List[int]):
+        async with uow:
+            roadmaps = await uow.roadmaps.find_all(id=roadmap_ids)
         
     @staticmethod
     async def get_roadmap_extended(uow: IUnitOfWork, roadmap_id: int):
         async with uow:
             roadmap = await uow.roadmaps.find_one(id=roadmap_id)
             
-            if not roadmap:
-                raise HTTPException(status_code=404, detail="Roadmap not found")
+            if roadmap is None:
+                return None
             
             roadmap_dict = roadmap.model_dump()
             cards = await uow.cards.find_all({"roadmap_id": roadmap_id})
@@ -91,17 +95,3 @@ class RoadmapsService:
             roadmap = await uow.roadmaps.delete_one(roadmap_id)
             await uow.commit()
             return roadmap
-        
-    @staticmethod
-    async def link_user_to_roadmap(uow: IUnitOfWork, roadmap_id: int, user_id: int):
-        async with uow:
-            await uow.user_roadmaps.add_one({"roadmap_id": roadmap_id, "user_id": user_id})
-            await uow.commit()
-
-    @staticmethod
-    async def change_background(uow: IUnitOfWork, roadmap_id: int, user_id: int, background: UserRoadmapEditDTO):
-        async with uow:
-            await uow.user_roadmaps.edit_one(
-                id_or_filter={"roadmap_id": roadmap_id, "user_id": user_id},
-                data=background
-            )

@@ -7,8 +7,13 @@ class TokenDTO(BaseModel):
     access_token: str
     token_type: str
 
+class LoginDTO(TokenDTO):
+    login: str
+    username: str
+
 class UserAuthDTO(BaseModel):
     id: int
+    name: str
     login: str
     password_hash: str
 
@@ -28,6 +33,12 @@ class UserEditDTO(BaseModel):
     name: Optional[str] = None
     password_hash: Optional[str] = None
     avatar: Optional[str] = None
+
+class SimplifiedRoadmapDTO(BaseModel):
+    id: int
+    title: str
+    description: str
+    difficulty: str
 
 class RoadmapAddDTO(BaseModel):
     owner_id: int

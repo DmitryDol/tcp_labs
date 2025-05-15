@@ -38,10 +38,14 @@ async def edit_card_link(
 @router.post("")
 async def add_card_link(
     user_dep: UserDep,
-    card_id: int,
     card_link: CardLinkAddDTO,
     uow: UOWDep,
 ):
-    card_link.card_id = card_id
+    card_info = await CardsService.get_card(uow, card_link.card_id)
+    roadmap_info = await RoadmapsService.get_roadmap(uow, card_info.roadmap_id)
+    
+    if roadmap_info.owner_id != user_dep['id'] and roadmap_info.edit_permission != "can edit":
+        raise HTTPException(status_code=403, detail='User does not have permission to add card link to this roadmap.')
+
     card_link_id = await CardLinksService.add_card_link(uow, card_link)
     return {"card_link_id": card_link_id}

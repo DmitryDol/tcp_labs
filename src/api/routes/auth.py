@@ -3,7 +3,7 @@ from fastapi import APIRouter, Cookie, Depends, HTTPException, Path, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 from config import settings
-from dto import TokenDTO, UserAddDTO, UserEditDTO
+from dto import LoginDTO, TokenDTO, UserAddDTO, UserAuthDTO, UserEditDTO
 from api.dependencies import RedisDep, UOWDep, UserDep
 from services.tokens import TokensService
 from services.users import UsersService
@@ -34,7 +34,7 @@ async def create_user(
 
 @router.post(
     "/token",
-    response_model=TokenDTO
+    response_model=LoginDTO
 )
 async def login_for_access_token(
     response: Response,
@@ -48,9 +48,9 @@ async def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate user."
         )
-    access_token = create_token(user.id, user.login, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+    access_token = create_token(user.id, user.login, user.name, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
 
-    refresh_token = create_token(user.id, user.login, timedelta(days=7))
+    refresh_token = create_token(user.id, user.login, user.name, timedelta(days=7))
 
     response.set_cookie(
         key="access_token",
@@ -72,7 +72,7 @@ async def login_for_access_token(
         expires=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
     )
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "username": user.name, "login": user.login}
 
 @router.post(
     '/refresh',
@@ -92,6 +92,7 @@ async def refresh_token(
     
     payload = jwt.decode(refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     user_id = payload.get("id")
+    user_name = payload.get('username')
     user_login = payload.get('sub')
     expires_at = datetime.fromtimestamp(payload.get('exp'), tz=UTC)
     jti = payload.get("jti")
@@ -114,8 +115,8 @@ async def refresh_token(
             # headers={"WWW-Authenticate": "Bearer"},
         )
     
-    new_access_token = create_token(user_id, user_login, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
-    new_refresh_token = create_token(user_id, user_login, timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
+    new_access_token = create_token(user_id, user_login, user_name, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+    new_refresh_token = create_token(user_id, user_login, user_name, timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS))
 
     await TokensService.revoke_token(jti, expires_at, redis_dep)
 
@@ -172,3 +173,9 @@ async def logout(
     response.delete_cookie(key="refresh_token")
     
     return {"detail": "Successfully logged out"}
+
+@router.get('/me')
+async def get_curr_user(
+    user_dep: UserDep
+):
+    return user_dep

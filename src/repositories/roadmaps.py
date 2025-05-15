@@ -1,7 +1,7 @@
 from typing import Any, List, Optional
 
 from sqlalchemy import select
-from dto import UserRoadmapDTO
+from dto import RoadmapDTO, UserRoadmapDTO
 from models import Roadmap
 from utils.repository import SQLAlchemyRepository
 
@@ -42,7 +42,7 @@ class RoadmapRepository(SQLAlchemyRepository):
             return [item.to_read_model() for item in results]
         return results
     
-    async def find_user_roadmaps(self, user_roadmaps_list: List[UserRoadmapDTO], search: Optional[str] = None, difficulty: Optional[str] = None, limit: Optional[int] = None) -> List[Any]:
+    async def find_user_roadmaps(self, roadmap_ids: List[int], search: Optional[str] = None, difficulty: Optional[str] = None, limit: Optional[int] = None) -> List[RoadmapDTO]:
         """
         Find roadmaps linked to user with search and filtering capabilities
         
@@ -55,7 +55,6 @@ class RoadmapRepository(SQLAlchemyRepository):
         Returns:
             List of the RoadmapDTO objects
         """
-        roadmap_ids = [ur.roadmap_id for ur in user_roadmaps_list]
         
         if not roadmap_ids:
             return []

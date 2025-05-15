@@ -16,8 +16,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verifying password using bcrypt"""
     return pwd_context.verify(plain_password, hashed_password)
 
-def create_token(id: int, login: str, expires_delta: timedelta):
-    encode = {'sub': login, 'id': id}
+def create_token(id: int, login: str, username: str, expires_delta: timedelta):
+    encode = {'sub': login, 'id': id, 'username': username}
     jti = str(uuid.uuid4())
     encode.update({'jti': jti})
     expires = datetime.now(UTC) + expires_delta
