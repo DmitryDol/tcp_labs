@@ -73,10 +73,9 @@ export const authAPI = {
       );
 
       localStorage.setItem("accessToken", response.access_token);
-
       const userData = {
-        login: response.login,
-        username: response.username,
+        login: response.data.login,
+        username: response.data.username,
       };
 
       localStorage.setItem("userData", JSON.stringify(userData));
@@ -87,18 +86,23 @@ export const authAPI = {
   },
   logout: async () => {
     try {
-      await apiClient.post("/api/core/auth/logout");
-
       localStorage.removeItem("accessToken");
-      localStorage.removeItem("login");
-      localStorage.removeItem("username");
+      const response = await apiClient.post("/api/core/auth/logout");
+
+      localStorage.removeItem("userData");
+      console.log(response.data)
+      return response.data;
     } catch (error) {
       handleError(error, "loging out");
     }
   },
   getCurrentUser: async () => {
     try {
-      const userData = await apiClient.get("/api/core/auth/me");
+      const response = await apiClient.get("/api/core/auth/me");
+      userData = {
+        login: response.data.login,
+        username: response.data.username,
+      };
       localStorage.setItem("userData", JSON.stringify(userData));
     } catch (error) {
       handleError(error, "getting current user");

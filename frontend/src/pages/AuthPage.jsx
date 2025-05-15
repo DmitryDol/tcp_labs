@@ -23,7 +23,7 @@ const AuthPage = () => {
       username: formData.login,
       password: formData.password,
     });
-    navigate("/mainpage");
+    navigate("/myroadmaps");
   };
 
   return (
@@ -43,7 +43,7 @@ const AuthPage = () => {
               name="login"
               value={formData.login}
               onChange={handleChange}
-              autoComplete="username"
+              // autoComplete="username"
               required
             />
           </Form.Group>
@@ -55,7 +55,7 @@ const AuthPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              autoComplete="current-password"
+              // autoComplete="current-password"
               required
             />
           </Form.Group>

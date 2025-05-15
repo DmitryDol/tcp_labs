@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Container, Form, Button, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
@@ -34,16 +33,6 @@ const RegisterPage = () => {
       return;
     }
     await authAPI.create(name, username, password);
-    // console.log(id);
-    // await axios.post("http://127.0.0.1:8000/auth", {
-    //   name: name,
-    //   login: username,
-    //   password_hash: password,
-    // }, {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // });
     // тут обработку ошибок добавить и только потом переход
     navigate("/");
   };
@@ -110,7 +99,7 @@ const RegisterPage = () => {
             </Alert>
           )}
 
-        <div >
+        <div className="d-flex justify-content-center gap-2">
           <Button type="submit" className="mt-3 btn-purple">
             Создать аккаунт
           </Button>
