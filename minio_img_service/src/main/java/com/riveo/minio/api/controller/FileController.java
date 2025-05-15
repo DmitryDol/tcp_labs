@@ -23,6 +23,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.Collections;
+import java.util.Map;
+
 @Tag(name = "Files", description = "Image management")
 @RestController
 @RequestMapping("/files")
@@ -70,10 +73,10 @@ public class FileController {
                             responseCode = "200",
                             description = "File successfully uploaded",
                             content = @Content(
-                                    mediaType = "text/plain",
+                                    mediaType = "application/json",
                                     schema = @Schema(
-                                            type = "string",
-                                            example = "f97fbd57-7224-4342-9c48-c04536067ade.png"
+                                            type = "object",
+                                            example = "{\\"filename\\": \\"f97fbd57-7224-4342-9c48-c04536067ade.png\\"}"
                                     )
                             )
                     ),
@@ -95,7 +98,7 @@ public class FileController {
             }
     )
     @PostMapping(value = "/{bucket}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> upload(
+    public ResponseEntity<Map<String, String>> upload(
             @Parameter(
                     description = "Bucket name (avatars, backgrounds)",
                     example = "avatars",
@@ -135,13 +138,13 @@ public class FileController {
         String token = extractToken(authHeader, accessTokenCookie, request);
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Authentication token is missing");
+                    .body(Collections.singletonMap("error", "Authentication token is missing"));
         }
         String userId = jwtUtil.validateTokenAndGetUserID(token);
 
-
         String filename = minioService.uploadFile(bucket, file, userId);
-        return ResponseEntity.ok(filename);
+        Map<String, String> responseBody = Collections.singletonMap("filename", filename);
+        return ResponseEntity.ok(responseBody);
     }
 
     @Operation(
@@ -217,8 +220,11 @@ public class FileController {
                             responseCode = "200",
                             description = "File deleted",
                             content = @Content(
-                                    mediaType = "text/plain",
-                                    schema = @Schema(example = "File example.jpg deleted from bucket avatars!")
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            type = "object",
+                                            example = "{\\"message\\": \\"File example.jpg deleted from bucket avatars!\\"}"
+                                    )
                             )
                     ),
                     @ApiResponse(
@@ -240,7 +246,7 @@ public class FileController {
             }
     )
     @DeleteMapping("/{bucket}/{filename}")
-    public ResponseEntity<String> delete(
+    public ResponseEntity<Map<String, String>> delete(
             @Parameter(
                     description = "Bucket name (avatars, backgrounds)",
                     example = "avatars",
@@ -271,10 +277,12 @@ public class FileController {
         String token = extractToken(authHeader, accessTokenCookie, request);
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Authentication token is missing");
+                    .body(Collections.singletonMap("error", "Authentication token is missing"));
         }
         String userId = jwtUtil.validateTokenAndGetUserID(token);
         minioService.deleteFile(bucket, filename, userId);
-        return ResponseEntity.ok("File " + filename + " deleted from bucket " + bucket + "!");
+        String message = "File " + filename + " deleted from bucket " + bucket + "!";
+        Map<String, String> responseBody = Collections.singletonMap("message", message);
+        return ResponseEntity.ok(responseBody);
     }
 }
