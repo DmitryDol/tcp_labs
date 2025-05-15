@@ -1,7 +1,7 @@
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
 from services.user_roadmaps import UserRoadmapsService
-from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, RoadmapExtendedDTO, UserRoadmapEditDTO
+from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, RoadmapExtendedDTO, SimplifiedRoadmapDTO, UserRoadmapEditDTO
 from api.dependencies import UOWDep, UserDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.get("/public", response_model=List[RoadmapDTO])
+@router.get("/public", response_model=List[SimplifiedRoadmapDTO])
 async def get_public_roadmaps(
     # user_dep: UserDep,
     uow: UOWDep,
