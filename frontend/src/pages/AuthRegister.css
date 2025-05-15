@@ -8,6 +8,7 @@
   .btn-purple {
     color: #fff; 
     background-color:#8a2be2 !important;
+    width: 50%;
   }
   .form-control {
     background-color: #adadad;

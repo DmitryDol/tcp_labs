@@ -101,10 +101,11 @@ const RegisterPage = () => {
 
         {error && <Alert variant="danger" className="mt-3 erroralert">{error}</Alert>}
 
-        <div className="d-grid">
+        <div >
           <Button type="submit" className="mt-3 btn-purple">
             Создать аккаунт
           </Button>
+          <Button className="mt-3 btn-purple" href="/">Назад</Button>
         </div>
       </Form>
     </Container>

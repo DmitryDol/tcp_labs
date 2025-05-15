@@ -1,0 +1,27 @@
+.cardcard{
+    background-color: unset;
+    overflow-y: auto;
+    border: unset;
+    min-width: 18rem;
+    max-width: 19rem;
+}
+.cardhead{
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.cardaccordion{
+    --bs-accordion-border-radius:0px
+}
+.cardbutton{
+    background-color: blueviolet;
+    color: white;
+    --bs-btn-hover-bg: blueviolet;
+    --bs-btn-active-bg: #a45be8
+}
+.settingsgroup{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}

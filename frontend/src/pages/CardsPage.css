@@ -1,0 +1,28 @@
+.cardblock{
+  display: flex;
+  gap: 20px;
+  flex-wrap: nowrap;
+  padding: 10px;
+  flex: 1 1 auto;
+  overflow-x: auto;
+  margin-left: 15px;
+}
+.left-card {
+  flex: 0 0 300px; 
+  height: 91vh; 
+  top: 0;
+  overflow: hidden; 
+}
+.container-flex {
+  display: flex;
+  flex-direction: row;
+}
+
+.add-button{
+    --bs-btn-hover-bg: blueviolet ; 
+    --bs-btn-active-bg: blueviolet
+}
+.addcardbutton{
+    min-width: 18rem;
+    height: 45px;
+}

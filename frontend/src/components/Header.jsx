@@ -4,7 +4,9 @@ import { Navbar, Nav, Container, Button, Dropdown , Image, NavDropdown} from 're
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Header.css"
 
-const Header = ({ showButtons, avatarUrl}) => {
+const avatar = "https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png?ssl=1";
+
+const Header = ({ showButtons, avatarUrl, user}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,17 +36,16 @@ const Header = ({ showButtons, avatarUrl}) => {
                 <NavDropdown.Item href="/editprofile" className="dropdownitem">Настройки профиля</NavDropdown.Item>
                 <NavDropdown.Item onClick={handleLogout} className="dropdownitem">Выйти</NavDropdown.Item>
               </NavDropdown>
-              {avatarUrl && (
-                <Image 
-                  src={avatarUrl} 
-                  alt="Аватар" 
-                  roundedCircle 
-                  style={{ width: '40px',
-                    height: '40px',
-                    objectFit: 'cover',
-                    marginLeft: '5px'}}
-                />
-              )}
+              <Image 
+                src={avatar} 
+                alt="Аватар" 
+                roundedCircle 
+                style={{ width: '40px',
+                  height: '40px',
+                  objectFit: 'cover',
+                  marginLeft: '5px'}}
+              />
+
             </Nav>
           </Navbar.Collapse>)}
         </Container>
