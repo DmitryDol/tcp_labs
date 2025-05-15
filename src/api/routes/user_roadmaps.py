@@ -1,8 +1,9 @@
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, HTTPException, Path
+from api.dependencies.pagination_dependency import PaginationDep
 from dto import SimplifiedRoadmapDTO, UserRoadmapAddDTO, UserRoadmapDTO, UserRoadmapEditDTO
 from services.user_roadmaps import UserRoadmapsService
-from api.dependencies import UOWDep, UserDep
+from api.dependencies.dependencies import UOWDep, UserDep
 from services.roadmaps import RoadmapsService
 
 router = APIRouter(
@@ -14,17 +15,17 @@ router = APIRouter(
 @router.get("", response_model=List[SimplifiedRoadmapDTO])
 async def get_linked_roadmaps(
     user_dep: UserDep,
+    pagination: PaginationDep,
     search: str,
     difficulty: str,
-    uow: UOWDep,
-    limit: Optional[int] = 0
+    uow: UOWDep
 ):
     roadmaps = await UserRoadmapsService.get_linked_roadmaps(
         uow=uow, 
         user_id=user_dep['id'], 
         search=search, 
         difficulty=difficulty, 
-        limit=limit
+        pagination=pagination
     )
 
     return roadmaps

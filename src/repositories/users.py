@@ -1,5 +1,3 @@
-from typing import Any, Optional
-
 from sqlalchemy import select
 from dto import UserAuthDTO
 from models import User
@@ -8,12 +6,12 @@ from utils.repository import SQLAlchemyRepository
 class UserRepository(SQLAlchemyRepository):
     model = User
 
-    async def find_auth_info(self, login) -> UserAuthDTO:
+    async def find_auth_info(self, login: str) -> UserAuthDTO:
         """
         Find a single record by filter criteria
         
         Args:
-            **filter_by: Filter conditions as keyword arguments
+            login: Filter conditions 
             
         Returns:
             Single model instance or None if not found

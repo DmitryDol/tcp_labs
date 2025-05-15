@@ -2,7 +2,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
 from services.user_roadmaps import UserRoadmapsService
 from dto import CardExtendedDTO, RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, UserRoadmapEditDTO
-from api.dependencies import UOWDep, UserDep
+from api.dependencies.dependencies import UOWDep, UserDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
 from services.card_links import CardLinksService

@@ -1,7 +1,8 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Cookie, HTTPException, Path, Response
 from dto import UserAddDTO, UserDTO, UserEditDTO
-from api.dependencies import UOWDep, UserDep
+from api.dependencies.dependencies import RedisDep, UOWDep, UserDep
+from services.tokens import TokensService
 from services.users import UsersService
 
 
@@ -24,9 +25,29 @@ async def get_user_info(
 )
 async def delete_user(
     user_dep: UserDep,
-    uow: UOWDep
+    uow: UOWDep,
+    redis_dep: RedisDep,
+    response: Response,
+    access_token: Optional[str] = Cookie(None),
+    refresh_token: Optional[str] = Cookie(None)
 ):
     await UsersService.delete_user(uow, user_dep['id'])
+
+    if access_token:
+        jti, expires_at = TokensService.prepare_token_for_revocation(access_token)
+        if jti and expires_at:
+            await TokensService.revoke_token(jti, expires_at, redis_dep)
+
+    if refresh_token:
+        jti, expires_at = TokensService.prepare_token_for_revocation(refresh_token)
+        if jti and expires_at:
+            await TokensService.revoke_token(jti, expires_at, redis_dep)
+
+    response.delete_cookie(key="access_token")
+    response.delete_cookie(key="refresh_token")
+
+    return {"detail": "Successfully deleted"}
+
 
 @router.patch("")
 async def edit_user(
@@ -35,4 +56,9 @@ async def edit_user(
     uow: UOWDep
 ):
     await UsersService.edit_user(uow, user_dep['id'], user)
-    return {"user_id": user_dep['id']}
+    user_data = await UsersService.get_user(uow, user_dep['id'])
+    return {
+        "user_id": user_dep['id'], 
+        'login': user_data.login, 
+        'username': user_data.name
+    }
