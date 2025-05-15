@@ -76,7 +76,7 @@ public class FileController {
                                     mediaType = "application/json",
                                     schema = @Schema(
                                             type = "object",
-                                            example = "{\\"filename\\": \\"f97fbd57-7224-4342-9c48-c04536067ade.png\\"}"
+                                            example = "{\"filename\": \"f97fbd57-7224-4342-9c48-c04536067ade.png\"}"
                                     )
                             )
                     ),
@@ -223,7 +223,7 @@ public class FileController {
                                     mediaType = "application/json",
                                     schema = @Schema(
                                             type = "object",
-                                            example = "{\\"message\\": \\"File example.jpg deleted from bucket avatars!\\"}"
+                                            example = "{\"message\": \"File example.jpg deleted from bucket avatars!\"}"
                                     )
                             )
                     ),
