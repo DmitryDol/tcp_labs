@@ -75,8 +75,8 @@ export const authAPI = {
       localStorage.setItem("accessToken", response.access_token);
 
       const userData = {
-        login: user.login,
-        username: user.username,
+        login: response.login,
+        username: response.username,
       };
 
       localStorage.setItem("userData", JSON.stringify(userData));
