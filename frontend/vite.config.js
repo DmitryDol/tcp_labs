@@ -7,6 +7,17 @@ export default defineConfig({
   server: {
     host: "127.0.0.1",
     port: 5050,
+    proxy: {
+      '/api/core': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/core/, '')
+      },
+      '/api/images': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/images/, '')
+      }
+    }
   },
-  
 })
