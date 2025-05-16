@@ -4,6 +4,7 @@ from dto import UserAddDTO, UserDTO, UserEditDTO
 from api.dependencies.dependencies import RedisDep, UOWDep, UserDep
 from services.tokens import TokensService
 from services.users import UsersService
+from utils.utils import hash_password
 
 
 router = APIRouter(
@@ -55,6 +56,8 @@ async def edit_user(
     user: UserEditDTO,
     uow: UOWDep
 ):
+    if hasattr(user, "password_hash"):
+        user.password_hash = hash_password(user.password_hash)
     await UsersService.edit_user(uow, user_dep['id'], user)
     user_data = await UsersService.get_user(uow, id=user_dep['id'])
     return {
