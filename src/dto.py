@@ -16,6 +16,7 @@ class UserAuthDTO(BaseModel):
     name: str
     login: str
     password_hash: str
+    avatar: str
 
 class UserAddDTO(BaseModel):
     name: str

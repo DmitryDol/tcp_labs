@@ -39,6 +39,7 @@ async def get_redis_client(request: Request):
         )
     return redis_client
 
+
 UOWDep = Annotated[IUnitOfWork, Depends(UnitOfWork)]
 UserDep = Annotated[dict, Depends(get_current_user)]
 RedisDep = Annotated[Redis, Depends(get_redis_client)]

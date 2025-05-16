@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional
+from api.dependencies.pagination_dependency import PaginationParams
 from dto import SimplifiedRoadmapDTO, UserRoadmapAddDTO, UserRoadmapDTO, UserRoadmapEditDTO
 from utils.unitofwork import IUnitOfWork
 
@@ -43,11 +44,11 @@ class UserRoadmapsService:
 
     @staticmethod
     async def get_linked_roadmaps(
-        uow: IUnitOfWork,
+        uow: IUnitOfWork, 
+        pagination: PaginationParams,
         user_id: int, 
         search: Optional[str] = None, 
-        difficulty: Optional[str] = None, 
-        limit: Optional[int] = None
+        difficulty: Optional[str] = None
     ):
         """
         Gets roadmaps linked to user_id with search and filtering capabilities 
@@ -66,20 +67,14 @@ class UserRoadmapsService:
             user_roadmaps_list = await uow.user_roadmaps.find_all({"user_id": user_id})
             roadmap_ids = [ur.roadmap_id for ur in user_roadmaps_list]
 
-            roadmaps = await uow.roadmaps.find_user_roadmaps(
+            roadmaps = await uow.user_roadmaps.find_user_roadmaps(
                 roadmap_ids=roadmap_ids,
                 search=search, 
                 difficulty=difficulty, 
-                limit=limit
+                pagination=pagination
             )
             
             simplified_roadmaps = [
-                # {
-                #     "roadmap_id": roadmap.id,
-                #     "title": roadmap.title,
-                #     "description": roadmap.description,
-                #     "difficulty": roadmap.difficulty.value if hasattr(roadmap.difficulty, 'value') else roadmap.difficulty
-                # },
                 SimplifiedRoadmapDTO.model_validate(roadmap, from_attributes=True)
                 for roadmap in roadmaps
             ]

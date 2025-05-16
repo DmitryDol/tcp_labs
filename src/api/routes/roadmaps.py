@@ -1,8 +1,9 @@
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
+from api.dependencies.pagination_dependency import PaginationDep
 from services.user_roadmaps import UserRoadmapsService
-from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, RoadmapExtendedDTO, SimplifiedRoadmapDTO, UserRoadmapEditDTO
-from api.dependencies import UOWDep, UserDep
+from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, RoadmapExtendedDTO, UserRoadmapEditDTO
+from api.dependencies.dependencies import UOWDep, UserDep
 from services.roadmaps import RoadmapsService
 from services.cards import CardsService
 from services.card_links import CardLinksService
@@ -17,11 +18,11 @@ router = APIRouter(
 async def get_public_roadmaps(
     # user_dep: UserDep,
     uow: UOWDep,
+    pagination: PaginationDep,
     search: Optional[str] = None,
-    difficulty: Optional[str] = None,
-    limit: int = 0
+    difficulty: Optional[str] = None
 ):
-    roadmaps = await RoadmapsService.get_public_roadmaps(uow, search, difficulty, limit)
+    roadmaps = await RoadmapsService.get_public_roadmaps(uow, pagination, search, difficulty)
     return roadmaps
     
 
@@ -32,6 +33,7 @@ async def add_roadmap(
     uow: UOWDep
 ):
     roadmap_id, user_id = await RoadmapsService.add_roadmap(uow, roadmap)
+    await UserRoadmapsService.link_user_to_roadmap(uow, roadmap_id, user_id)
     return {"roadmap_id": roadmap_id, "user_id": user_id}
 
 @router.get("/{roadmap_id}", response_model=RoadmapExtendedDTO)

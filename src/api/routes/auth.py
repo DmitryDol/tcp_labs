@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
 from config import settings
 from dto import LoginDTO, TokenDTO, UserAddDTO, UserAuthDTO, UserEditDTO
-from api.dependencies import RedisDep, UOWDep, UserDep
+from api.dependencies.dependencies import RedisDep, UOWDep, UserDep
 from services.tokens import TokensService
 from services.users import UsersService
 from starlette import status
@@ -72,7 +72,13 @@ async def login_for_access_token(
         expires=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
     )
 
-    return {"access_token": access_token, "token_type": "bearer", "username": user.name, "login": user.login}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer", 
+        "username": user.name, 
+        "login": user.login, 
+        "avatar": user.avatar
+    }
 
 @router.post(
     '/refresh',
@@ -154,19 +160,13 @@ async def logout(
     refresh_token: Optional[str] = Cookie(None)
 ):
     if access_token:
-        payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        jti = payload.get('jti')
-        exp = payload.get('exp')
-        if jti and exp:
-            expires_at = datetime.fromtimestamp(exp, tz=UTC)
+        jti, expires_at = TokensService.prepare_token_for_revocation(access_token)
+        if jti and expires_at:
             await TokensService.revoke_token(jti, expires_at, redis_dep)
 
     if refresh_token:
-        payload = jwt.decode(refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        jti = payload.get('jti')
-        exp = payload.get('exp')
-        if jti and exp:
-            expires_at = datetime.fromtimestamp(exp, tz=UTC)
+        jti, expires_at = TokensService.prepare_token_for_revocation(refresh_token)
+        if jti and expires_at:
             await TokensService.revoke_token(jti, expires_at, redis_dep)
 
     response.delete_cookie(key="access_token")

@@ -1,7 +1,10 @@
 from datetime import UTC, datetime
+from jose import jwt
 import logging
 
 from redis.asyncio import Redis
+
+from config import settings
 
 logger = logging.getLogger('TokensService')
 
@@ -22,3 +25,14 @@ class TokensService:
             logger.debug(f'redis: revoke_token {await redis_client.get(key)}')
         else:
             logger.debug(f'token not revoked {remaining_time.total_seconds()}')
+
+    @staticmethod
+    def prepare_token_for_revocation(token: str):
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        jti = payload.get('jti')
+        exp = payload.get('exp')
+        if jti and exp:
+            expires_at = datetime.fromtimestamp(exp, tz=UTC)
+            return jti, expires_at
+        return jti, exp
+    
