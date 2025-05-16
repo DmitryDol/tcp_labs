@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Card from "react-bootstrap/Card";
 import { Accordion, Button, Dropdown } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
@@ -11,6 +11,18 @@ function RoadmapView({ roadmapData }) {
   const location = useLocation();
   const pathWithCards = `${location.pathname}/${roadmapData.id}`;
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [background, setBackground] = useState();
+  useEffect(() => {
+    const getBackground = async () => {
+      let filename = await userRoadmapAPI.getBackgroundFilename(roadmapData.id);
+      if (filename===undefined)
+      {filename = import.meta.env.VITE_DEFAULT_BACKGROUND}
+      const imageurl = minioAPI.getImageUrl(filename, "backgrounds");
+      console.log(filename)
+      setBackground(imageurl);}
+      getBackground()
+    },[roadmapData.id])
+
  
   // тут надо как то получать состояния роадмапа: кем он создан и можно ли редактировать
   let isMade = true;
@@ -111,7 +123,7 @@ function RoadmapView({ roadmapData }) {
             />
           </Card.Footer>
         </Card.Body>
-        <Card.Img src={minioAPI.getImageUrl('d36563e3-9b4a-44bd-9e14-cd86c0603335.jpg', 'backgrounds')} alt="Card image" className="cardimg" />
+        <Card.Img src={background} alt="Card image" className="cardimg" />
       </div>
       <Accordion>
         <Accordion.Item eventKey="0">

@@ -7,20 +7,19 @@ import { FaSearch } from 'react-icons/fa';
 import { roadmapAPI } from "../api/api";
 import "./RoadmapSearchPage.css"
 
-const background = "https://i.pinimg.com/736x/35/a8/19/35a8199c0fffa403c3b03fc5680c5041.jpg";
-const background2 ="https://repository-images.githubusercontent.com/185094183/ff64fd00-706f-11e9-9b53-d05acb2d0989"
 
 const RoadmapSearchPage = () => {
+
+  const itemsPerPage = 6;
   const [roadmaps, setRoadmaps] = useState([]);
   useEffect(() => {
     const fetchRoadmaps = async () => {
-      const roadmapsData = await roadmapAPI.getPublic(6,0); 
+      const roadmapsData = await roadmapAPI.getPublic(itemsPerPage,0); 
       setRoadmaps(roadmapsData);
     }
     fetchRoadmaps();
-  }, []); 
+  }, [itemsPerPage]); 
   
-  const itemsPerPage = 6;
   const [activePage, setActivePage] = useState(1);
 
   const indexOfLastItem = activePage * itemsPerPage;
