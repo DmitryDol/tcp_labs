@@ -38,7 +38,7 @@ async def add_roadmap(
 
 @router.get("/{roadmap_id}", response_model=RoadmapExtendedDTO)
 async def get_roadmap_info(
-    user_dep: Optional[UserDep],
+    user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     uow: UOWDep
 ):

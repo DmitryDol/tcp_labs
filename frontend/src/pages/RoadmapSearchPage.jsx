@@ -14,7 +14,7 @@ const RoadmapSearchPage = () => {
   const [roadmaps, setRoadmaps] = useState([]);
   useEffect(() => {
     const fetchRoadmaps = async () => {
-      const roadmapsData = await roadmapAPI.getPublic(limit = 6); 
+      const roadmapsData = await roadmapAPI.getPublic(6,0); 
       setRoadmaps(roadmapsData);
     }
     fetchRoadmaps();
