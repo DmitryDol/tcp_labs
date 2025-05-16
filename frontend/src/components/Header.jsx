@@ -1,15 +1,31 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Navbar, Nav, Container, Button, Dropdown , Image, NavDropdown} from 'react-bootstrap';
-import { authAPI } from "../api/api";
+import { authAPI, minioAPI } from "../api/api";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Header.css"
 
-const avatar = "https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png?ssl=1";
+//const avatar = "https://i0.wp.com/sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png?ssl=1";
 
 const Header = ({ showButtons}) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [avatar, setAvatar] = useState(null)
+
+  useEffect(() => {
+    const getAvatar = async () => {
+      // console.log(import.meta.env.VITE_DEFAULT_AVATAR)
+      let filename = localStorage.getItem("avatar")
+      if (filename === undefined){
+        filename = import.meta.env.VITE_DEFAULT_AVATAR
+      }
+      console.log(localStorage.getItem("avatar") == "undefined")
+      const imageUrl = minioAPI.getImageUrl(filename, "avatars")
+      setAvatar(imageUrl)
+    };
+    getAvatar();
+  })
 
   const handleLogout = async() => {
     await authAPI.logout();

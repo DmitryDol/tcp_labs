@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Header from "../components/Header";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -6,7 +6,7 @@ import { Form, Alert, Modal } from "react-bootstrap";
 import "./EditProfilePage.css";
 import { minioAPI, userAPI } from "../api/api";
 
-const avatarUrl = "";
+// const avatar = "";
 const EditProfilePage = () => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -16,6 +16,19 @@ const EditProfilePage = () => {
     name: "",
     password: "",
     password2: "",
+  });
+  const [avatar, setAvatar] = useState(null);
+
+  useEffect(() => {
+    const getAvatar = async () => {
+      let filename = localStorage.getItem("avatar");
+      if (filename == "undefined") {
+        filename = import.meta.env.VITE_DEFAULT_AVATAR;
+      }
+      const imageUrl = minioAPI.getImageUrl(filename, "avatars");
+      setAvatar(imageUrl);
+    };
+    getAvatar();
   });
 
   const handleChange = (e) => {
@@ -51,9 +64,13 @@ const EditProfilePage = () => {
   const handleDeleteAvatar = async () => {
     try {
       const updatedUserInfo = await userAPI.deleteUserAvatar();
-      setAvatarDisplayUrl(minioAPI.getImageUrl(updatedUserInfo.avatar, "avatars"));
+      filename = import.meta.env.VITE_DEFAULT_AVATAR;
+      if (localStorage.getItem("avatar") !== undefined) {
+        filename = localStorage.getItem("avatar");
+      }
+      setAvatar(minioAPI.getImageUrl(filename, "avatars"));
     } catch (err) {
-      console.error("delete avatar")
+      console.error("delete avatar");
     }
   };
 
@@ -62,25 +79,37 @@ const EditProfilePage = () => {
     if (file) {
       try {
         const updatedUserInfo = await userAPI.changeUserAvatar(file);
-        setAvatarDisplayUrl(minioAPI.getImageUrl(updatedUserInfo.avatar, "avatars"));
+        filename = import.meta.env.VITE_DEFAULT_AVATAR;
+        if (localStorage.getItem("avatar") !== undefined) {
+          filename = localStorage.getItem("avatar");
+        }
+        if (updatedUserInfo !== undefined) {
+          filename = updatedUserInfo.avatar;
+        }
+        setAvatar(minioAPI.getImageUrl(filename, "avatars"));
       } catch (err) {
-        console.error("selected_avatar")
+        console.error("selected_avatar");
       }
     }
   };
 
   return (
     <>
-      <Header showButtons={true} avatarUrl={avatarUrl} />
+      <Header showButtons={true} avatar={avatar} />
       <div className="content">
         <h2 className="mb-4 text-left">Редактировать профиль</h2>
         <div className="top-block">
           <span className="avatar-wrapper">
-            <img src={avatarUrl} alt="avatar" className="avatar" />
+            <img src={avatar} alt="avatar" className="avatar" />
           </span>
           <div className="user-info">
-            <div>{JSON.parse(localStorage.getItem("userData"))?.username || "Имя пользователя"}</div>
-            <div>{JSON.parse(localStorage.getItem("userData"))?.login || "Логин"}</div>
+            <div>
+              {JSON.parse(localStorage.getItem("userData"))?.username ||
+                "Имя пользователя"}
+            </div>
+            <div>
+              {JSON.parse(localStorage.getItem("userData"))?.login || "Логин"}
+            </div>
           </div>
         </div>
         <ButtonGroup size="sm">
