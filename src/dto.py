@@ -10,6 +10,7 @@ class TokenDTO(BaseModel):
 class LoginDTO(TokenDTO):
     login: str
     username: str
+    avatar: str
 
 class UserAuthDTO(BaseModel):
     id: int
@@ -81,7 +82,13 @@ class UserRoadmapAddDTO(BaseModel):
     user_id: int
     roadmap_id: int
 
+class UserRoadmapAddExtendedDTO(UserRoadmapAddDTO):
+    card_ids: list[int]
+
 class UserRoadmapDTO(UserRoadmapAddDTO):
+    background: str
+
+class BackgroundDTO(BaseModel):
     background: str
 
 class UserRoadmapEditDTO(BaseModel):

@@ -1,4 +1,4 @@
-from dto import CardLinkAddDTO, CardLinkEditDTO
+from dto import CardLinkAddDTO, CardLinkDTO, CardLinkEditDTO
 from utils.unitofwork import IUnitOfWork
 
 class CardLinksService:
@@ -14,13 +14,20 @@ class CardLinksService:
     async def edit_card_link(uow: IUnitOfWork, card_link_id: int , card_link: CardLinkEditDTO):
         card_link_dict = card_link.model_dump(exclude_unset=True)
         async with uow:
-            await uow.card_links.edit_one(card_link_id, card_link_dict)
+            card_link_id = await uow.card_links.edit_one(card_link_id, card_link_dict)
             await uow.commit()
+            return card_link_id
 
     @staticmethod
-    async def get_card_links(uow: IUnitOfWork):
+    async def get_card_links(uow: IUnitOfWork) -> CardLinkDTO:
         async with uow:
             card_links = await uow.card_links.find_all()
+            return card_links
+        
+    @staticmethod
+    async def get_card_link(uow: IUnitOfWork, card_link_id: int) -> CardLinkDTO:
+        async with uow:
+            card_links = await uow.card_links.find_one(card_link_id)
             return card_links
         
     @staticmethod

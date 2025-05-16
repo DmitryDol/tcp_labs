@@ -1,3 +1,4 @@
+from typing import Optional
 from dto import CardAddDTO, CardDTO, CardEditDTO, CardExtendedDTO
 from utils.unitofwork import IUnitOfWork
 
@@ -25,10 +26,10 @@ class CardsService:
             return cards
         
     @staticmethod
-    async def get_card(uow: IUnitOfWork, card_id) -> CardDTO:
+    async def get_card(uow: IUnitOfWork, card_id) -> Optional[CardDTO]:
         async with uow:
             card = await uow.cards.find_one(card_id)
-            return CardDTO.model_validate(card, from_attributes=True)
+            return card
         
     @staticmethod
     async def delete_card(uow: IUnitOfWork, card_id: int):
@@ -38,11 +39,18 @@ class CardsService:
             return card
         
     @staticmethod
-    async def get_card_extended(uow: IUnitOfWork, card_id: int):
+    async def get_card_extended(uow: IUnitOfWork, card_id: int) -> Optional[CardExtendedDTO]:
         async with uow:
             card = await uow.cards.find_one(id=card_id)
+            
+            if card is None:
+                return None
+            
             card_dict = card.model_dump()
             card_links = await uow.card_links.find_all({"card_id": card.id})
-            card_dict["links"] = [card_link.model_dump() for card_link in card_links]
+            if card_links:
+                card_dict["links"] = [card_link.model_dump() for card_link in card_links]
+            else:
+                card_dict["links"] = []
             extended_card = CardExtendedDTO.model_validate(card_dict, from_attributes=True)
             return extended_card

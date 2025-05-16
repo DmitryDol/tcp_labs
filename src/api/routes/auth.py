@@ -43,7 +43,7 @@ async def login_for_access_token(
 ):
     user = await UsersService.authenticate_user(uow, form_data.username, form_data.password)
 
-    if not user:
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate user."

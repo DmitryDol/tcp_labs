@@ -1,7 +1,8 @@
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, HTTPException, Path
 from api.dependencies.pagination_dependency import PaginationDep
-from dto import SimplifiedRoadmapDTO, UserRoadmapAddDTO, UserRoadmapDTO, UserRoadmapEditDTO
+from dto import SimplifiedRoadmapDTO, UserRoadmapAddDTO, UserRoadmapAddExtendedDTO, UserRoadmapDTO, UserRoadmapEditDTO
+from services.user_cards import UserCardService
 from services.user_roadmaps import UserRoadmapsService
 from api.dependencies.dependencies import UOWDep, UserDep
 from services.roadmaps import RoadmapsService
@@ -30,14 +31,25 @@ async def get_linked_roadmaps(
 
     return roadmaps
 
-@router.post("/{roadmap_id}", response_model=UserRoadmapAddDTO)
+@router.post("/{roadmap_id}", response_model=UserRoadmapAddExtendedDTO)
 async def link_user_to_roadmap(
     user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
     uow: UOWDep
 ):
+    roadmap = await RoadmapsService.get_roadmap(uow, roadmap_id)
+    
+    if roadmap is None:
+        raise HTTPException(status_code=404, detail="Roadmap not found")
+
     user_roadmap_id = await UserRoadmapsService.link_user_to_roadmap(uow, roadmap_id, user_dep['id'])
-    return user_roadmap_id
+    card_ids = await UserCardService.link_user_to_cards_in_roadmap(uow, user_dep['id'], roadmap_id)
+    user_roadmap_id_with_card_ids = {
+        "user_id": user_roadmap_id.user_id,
+        "roadmap_id": user_roadmap_id.roadmap_id,
+        "card_ids": card_ids   
+    }
+    return UserRoadmapAddExtendedDTO.model_validate(user_roadmap_id_with_card_ids, from_attributes=True)
 
 @router.delete(
         "/{roadmap_id}",
@@ -49,8 +61,10 @@ async def delete_user_roadmap_link(
     uow: UOWDep
 ):
     roadmap_info = await RoadmapsService.get_roadmap(uow, roadmap_id)
+    
     if roadmap_info is None:
         raise HTTPException(status_code=404, detail=f'Roadmap with id: {roadmap_id} not found')
+    
     if roadmap_info.owner_id == user_dep['id']:
         await RoadmapsService.delete_roadmap(uow, roadmap_id)
     else:
@@ -63,6 +77,10 @@ async def get_roadmap_background(
     uow: UOWDep
 ):
     background = await UserRoadmapsService.get_background(uow, {"user_id": user_dep['id'], "roadmap_id": roadmap_id})
+    
+    if background is None:
+        raise HTTPException(status_code=404, detail="User roadmap relation not found")
+
     return background
 
 @router.put("/{roadmap_id}/background")
@@ -72,5 +90,14 @@ async def edit_roadmap_background(
     background: str,
     uow: UOWDep
 ):
+    roadmap = await RoadmapsService.get_roadmap(uow, roadmap_id)
+
+    if roadmap is None:
+        raise HTTPException(status_code=404, detail="Roadmap not found")
+    
+    user_roadmap = await UserRoadmapsService.get_background(uow, {"user_id": user_dep['id'], "roadmap_id": roadmap_id})
+    if user_roadmap is None:
+        raise HTTPException(status_code=404, detail="User roadmap relation not found")
+
     await UserRoadmapsService.change_background(uow, roadmap_id, user_dep['id'], UserRoadmapEditDTO.model_validate(background=background, from_attributes=True))
 

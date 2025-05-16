@@ -1,4 +1,7 @@
-from dto import UserCardAddDTO, UserCardEditDTO
+from typing import List, Optional
+from dto import CardDTO, RoadmapDTO, UserCardAddDTO, UserCardEditDTO
+from services.cards import CardsService
+from services.roadmaps import RoadmapsService
 from utils.unitofwork import IUnitOfWork
 
 
@@ -30,3 +33,28 @@ class UserCardService:
             user_card = await uow.user_cards.delete_one(user_card_id)
             await uow.commit()
             return user_card
+        
+    @staticmethod
+    async def link_user_to_cards_in_roadmap(uow: IUnitOfWork, user_id: int, roadmap_id: int):
+        roadmap: Optional[RoadmapDTO] = RoadmapsService.get_roadmap(uow, roadmap_id)
+        
+        if roadmap is None:
+            return None
+        
+        async with uow:
+            cards: List[CardDTO] = await uow.cards.find_all(roadmap_id=roadmap.id)
+
+            if not cards:
+                return None
+            
+            card_ids = []
+            for card in cards:
+                user_card = {
+                    'user_id': user_id,
+                    'card_id': card.id
+                }
+                card_id = UserCardService.add_user_card(uow, UserCardAddDTO.model_validate(user_card))
+                card_ids.append(card_id)
+            return card_ids
+        
+
