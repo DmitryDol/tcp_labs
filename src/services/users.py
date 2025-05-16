@@ -6,13 +6,13 @@ from utils.utils import hash_password, verify_password
 
 class UsersService:
     @staticmethod
-    async def authenticate_user(uow: IUnitOfWork, login: str, password: str) -> UserAuthDTO:
+    async def authenticate_user(uow: IUnitOfWork, login: str, password: str) -> Optional[UserAuthDTO]:
         async with uow:
             user: UserAuthDTO = await uow.users.find_auth_info(login)
             if not user:
-                return False
+                return None
             if not verify_password(password, user.password_hash):
-                return False
+                return None
             return user
 
     @staticmethod

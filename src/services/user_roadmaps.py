@@ -37,10 +37,10 @@ class UserRoadmapsService:
             return user_roadmap
         
     @staticmethod
-    async def get_background(uow: IUnitOfWork, user_roadmap_id: Dict[str, int]) -> UserRoadmapDTO:
+    async def get_background(uow: IUnitOfWork, user_roadmap_id: Dict[str, int]) -> Optional[UserRoadmapDTO]:
         async with uow:
-            background = await uow.user_roadmaps.find_one(user_id=user_roadmap_id['user_id'], roadmap_id=user_roadmap_id['roadmap_id'])
-            return background
+            user_roadmap = await uow.user_roadmaps.find_one(user_id=user_roadmap_id['user_id'], roadmap_id=user_roadmap_id['roadmap_id'])
+            return user_roadmap
 
     @staticmethod
     async def get_linked_roadmaps(

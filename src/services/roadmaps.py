@@ -27,7 +27,7 @@ class RoadmapsService:
             await uow.commit()
 
     @staticmethod
-    async def get_roadmap(uow: IUnitOfWork, roadmap_id: int) -> RoadmapDTO:
+    async def get_roadmap(uow: IUnitOfWork, roadmap_id: int) -> Optional[RoadmapDTO]:
         async with uow:
             roadmaps = await uow.roadmaps.find_one(id=roadmap_id)
             return roadmaps

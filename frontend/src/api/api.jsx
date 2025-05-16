@@ -91,7 +91,7 @@ export const authAPI = {
       const response = await apiClient.post("/api/core/auth/logout");
 
       localStorage.removeItem("userData");
-      console.log(response.data);
+      // console.log(response.data);
       return response.data;
     } catch (error) {
       handleError(error, "loging out");

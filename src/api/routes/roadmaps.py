@@ -1,6 +1,7 @@
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Path
 from api.dependencies.pagination_dependency import PaginationDep
+from services.user_cards import UserCardService
 from services.user_roadmaps import UserRoadmapsService
 from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, CardAddDTO, CardEditDTO, CardLinkAddDTO, CardLinkEditDTO, RoadmapExtendedDTO, SimplifiedRoadmapDTO, UserRoadmapEditDTO
 from api.dependencies.dependencies import UOWDep, UserDep
@@ -32,6 +33,7 @@ async def add_roadmap(
     roadmap: RoadmapAddDTO,
     uow: UOWDep
 ):
+    roadmap.owner_id = user_dep['id']
     roadmap_id, user_id = await RoadmapsService.add_roadmap(uow, roadmap)
     await UserRoadmapsService.link_user_to_roadmap(uow, roadmap_id, user_id)
     return {"roadmap_id": roadmap_id, "user_id": user_id}
@@ -43,10 +45,13 @@ async def get_roadmap_info(
     uow: UOWDep
 ):
     extended_roadmap = await RoadmapsService.get_roadmap_extended(uow, roadmap_id)
+
     if extended_roadmap is None:
         raise HTTPException(status_code=404, detail="Roadmap not found")
+    
     if extended_roadmap.owner_id != user_dep['id'] and extended_roadmap.visibility == 'private':
         raise HTTPException(status_code=403, detail="Roadmap is private")
+    
     return extended_roadmap
 
 @router.patch("/{roadmap_id}")
@@ -56,12 +61,17 @@ async def edit_roadmap(
     roadmap: RoadmapEditDTO,
     uow: UOWDep
 ):
-    roadmap_info: RoadmapDTO = RoadmapsService.get_roadmap(uow, roadmap_id)
+    roadmap_info: Optional[RoadmapDTO] = RoadmapsService.get_roadmap(uow, roadmap_id)
+
+    if roadmap_info is None:
+        raise HTTPException(status_code=404, detail="Roadmap not found")
+
     if roadmap_info.owner_id != user_dep['id'] and roadmap_info.edit_permission != "can edit":
         raise HTTPException(
             status_code=403, 
             detail='The user does not have permission to edit this roadmap'
         )
+    
     await RoadmapsService.edit_roadmap(uow, roadmap_id, roadmap)
     return {"roadmap_id": roadmap_id}
 
@@ -75,6 +85,10 @@ async def delete_roadmap(
     uow: UOWDep
 ):
     roadmap = await RoadmapsService.get_roadmap(uow, roadmap_id)
+    
+    if roadmap is None:
+        raise HTTPException(status_code=404, detail="Roadmap not found")
+    
     if roadmap.owner_id != user_dep['id']:
         raise HTTPException(
             status_code=403, 

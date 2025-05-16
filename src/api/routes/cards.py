@@ -18,9 +18,14 @@ async def add_card(
     card: CardAddDTO,
     uow: UOWDep,
 ):
-    roadmap_info: RoadmapDTO = RoadmapsService.get_roadmap(uow, card.roadmap_id)
+    roadmap_info: Optional[RoadmapDTO] = RoadmapsService.get_roadmap(uow, card.roadmap_id)
+
+    if roadmap_info is None:
+        raise HTTPException(status_code=404, detail='Roadmap not found')
+    
     if roadmap_info.owner_id != user_dep['id'] and roadmap_info.edit_permission != "can edit":
         raise HTTPException(status_code=403, detail='User does not have permission to edit this card.')
+    
     card_id = await CardsService.add_card(uow, card)
     return {"card_id": card_id}
 
@@ -31,6 +36,15 @@ async def get_card_info(
     uow: UOWDep
 ):
     card = await CardsService.get_card_extended(uow, card_id)
+    
+    if card is None:
+        raise HTTPException(status_code=404, detail='Card not found')
+
+    roadmap_info = await RoadmapsService.get_roadmap(uow, card.roadmap_id)
+
+    if roadmap_info.owner_id != user_dep['id'] and roadmap_info.visibility == 'private':
+        raise HTTPException(status_code=403, detail='User does not have permission to view card of this roadmap')
+    
     return card
 
 @router.delete(
@@ -42,6 +56,17 @@ async def delete_card(
     card_id: Annotated[int, Path(title="Card id")],
     uow: UOWDep
 ):
+    
+    card = await CardsService.get_card(uow, card_id)
+    
+    if card is None:
+        raise HTTPException(status_code=404, detail='Card not found')
+    
+    roadmap_info = await RoadmapsService.get_roadmap(uow, card.roadmap_id)
+
+    if roadmap_info.owner_id != user_dep['id'] and roadmap_info.edit_permission != 'can edit':
+        raise HTTPException(status_code=403, detail='User does not have permission to view card of this roadmap')
+    
     await CardsService.delete_card(uow, card_id)
 
 @router.patch("/{card_id}")
@@ -51,5 +76,15 @@ async def edit_card(
     card: CardEditDTO,
     uow: UOWDep
 ):
+    card_info = await CardsService.get_card(uow, card_id)
+    
+    if card_info is None:
+        raise HTTPException(status_code=404, detail='Card not found')
+    
+    roadmap_info = await RoadmapsService.get_roadmap(uow, card.roadmap_id)
+
+    if roadmap_info.owner_id != user_dep['id'] and roadmap_info.edit_permission != 'can edit':
+        raise HTTPException(status_code=403, detail='User does not have permission to view card of this roadmap')
+
     await CardsService.edit_card(uow, card_id, card)
     return {"card_id": card_id}
