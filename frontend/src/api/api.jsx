@@ -33,6 +33,8 @@ apiClient.interceptors.response.use(
         return apiClient(error.config);
       } catch (refreshError) {
         // Если не удалось обновить токен, перенаправляем на логин
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userData");
         const navigate = useNavigate();
         navigate("/");
       }
@@ -79,6 +81,7 @@ export const authAPI = {
       };
 
       localStorage.setItem("userData", JSON.stringify(userData));
+      localStorage.setItem("avatar", response.data.avatar)
       return response.data;
     } catch (error) {
       handleError(error, "logging in");
@@ -90,7 +93,7 @@ export const authAPI = {
       const response = await apiClient.post("/api/core/auth/logout");
 
       localStorage.removeItem("userData");
-      console.log(response.data)
+      console.log(response.data);
       return response.data;
     } catch (error) {
       handleError(error, "loging out");
@@ -115,6 +118,12 @@ export const userAPI = {
   getUserInfo: async () => {
     try {
       const response = await apiClient.get("/api/core/users");
+      userData = {
+        login: response.data.login,
+        username: response.data.username,
+      };
+      localStorage.setItem("userData", JSON.stringify(userData));
+      localStorage.setItem("avatar", response.data.avatar)
       return response.data;
     } catch (error) {
       handleError(error, "getting user info");
@@ -128,18 +137,65 @@ export const userAPI = {
       handleError(error, "deleting user");
     }
   },
-  editUserInfo: async (name, password, avatar) => {
+  editUserInfo: async (name, password) => {
     try {
       const dataToUpdate = {};
-      if (name !== undefined) dataToUpdate.name = name;
-      if (password !== undefined) dataToUpdate.password_hash = password;
-      if (avatar !== undefined) dataToUpdate.avatar = avatar;
+      if (name !== undefined) {
+        dataToUpdate.name = name;
+      }
+      if (password !== undefined) {
+        dataToUpdate.password_hash = password;
+      }
       const response = await apiClient.patch("/api/core/users", dataToUpdate);
-      return response;
+      // Обновляем userData в localStorage, если бэкенд возвращает актуальные username и login
+      // Предполагается, что бэкенд возвращает { login, username, ... }
+      if (response.data && response.data.login && response.data.username) {
+        const userData = { 
+            login: response.data.login,
+            username: response.data.username,
+        };
+        localStorage.setItem("userData", JSON.stringify(userData));
+      }
+      return response.data;
     } catch (error) {
       handleError(error, "editing user info");
     }
   },
+  changeUserAvatar: async (file) => {
+    try {
+      // currentAvatar = userAPI.getUserInfo().avatar
+      const currentAvatar = localStorage.getItem('avatar')
+      if (currentAvatar && currentAvatar !== import.meta.env.VITE_DEFAULT_AVATAR_FILENAME) {
+        await minioAPI.deleteImage(currentAvatar, "avatars");
+      }
+      const newAvatar = await minioAPI.uploadImage(file, "avatars");
+      const response = await apiClient.put(
+        `/api/core/users`,
+        { avatar: newAvatar.filename }
+      );
+      localStorage.setItem('avatar', response.data.filename)
+      return response.data;
+    } catch (error) {
+      handleError(error, "changing user avatar");
+    }
+  },
+  deleteUserAvatar: async () => {
+    try {
+      const currentAvatar = localStorage.getItem("avatar")
+      const defaultAvatar = import.meta.env.VITE_DEFAULT_AVATAR_FILENAME
+      if (currentAvatar && currentAvatar !== defaultAvatarFilename) {
+        await minioAPI.deleteImage(currentAvatar, "avatars");
+      }
+      const response = await apiClient.patch(
+        `/api/core/users`,
+        { avatar: defaultAvatarFilename }
+      );
+      localStorage.setItem('avatar', defaultAvatarFilename);
+      return response.data;
+    } catch (error) {
+      handleError(error, "deleting user avatar")
+    }
+  }
 };
 
 // --- Roadmaps ---
@@ -265,12 +321,13 @@ export const userRoadmapAPI = {
       handleError(error, "unlinking user from roadmap");
     }
   },
-  getBackgroundFilename: async (roadmapId) => {
+  getBackground: async (roadmapId) => {
     try {
       const response = await apiClient.get(
         `/api/core/user_roadmaps/${roadmapId}/background`
       );
-      return response.data.background;
+      
+      return minioAPI.getImageUrl(response.data.background, "backgrounds");
     } catch (error) {
       handleError(error, "getting background filename");
     }
@@ -279,7 +336,7 @@ export const userRoadmapAPI = {
     try {
       currentBackground = userRoadmapAPI.getBackgroundFilename(roadmapId);
       await minioAPI.deleteImage(currentBackground, "avatars");
-      const background = await minioAPI.uploadImage(file, "backgrounds");
+      const background = await minioAPI.uploadImage(file, "backgrounds").filename;
       const response = await apiClient.put(
         `/api/core/user_roadmaps/${roadmapId}/background`,
         { background }
@@ -386,7 +443,7 @@ export const cardLinkAPI = {
 
 // --- Image Service (Java Backend - /api/images) ---
 
-const minioAPI = {
+export const minioAPI = {
   uploadImage: async (file, bucket) => {
     const formData = new FormData();
     formData.append("file", file);

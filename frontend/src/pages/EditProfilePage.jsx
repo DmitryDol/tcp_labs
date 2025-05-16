@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import { Form, Alert, Modal } from "react-bootstrap";
 import "./EditProfilePage.css";
+import { minioAPI, userAPI } from "../api/api";
 
 const avatarUrl = "";
 const EditProfilePage = () => {
@@ -13,7 +14,6 @@ const EditProfilePage = () => {
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
-    username: "",
     password: "",
     password2: "",
   });
@@ -25,9 +25,10 @@ const EditProfilePage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, username, password, password2 } = formData;
+    const { name, password, password2 } = formData;
+
     if (password.length < 6 || password.length > 16) {
       setError("Пароль должен содержать от 6 до 16 символов");
       return;
@@ -37,23 +38,34 @@ const EditProfilePage = () => {
       return;
     }
     // Здесь логика сохранения изменений
-    alert("Изменения сохранены!");
+    await userAPI.editUserInfo(name, password);
+    // alert("Изменения сохранены!");
   };
 
   const inputRef = useRef(null);
 
-  const handleButtonClick = () => {
+  const handleAvatarChangeClick = () => {
     inputRef.current.click();
   };
-  const handleDeleteAvatar = (e) => {
-    //тут логика удаления аватара
+
+  const handleDeleteAvatar = async () => {
+    try {
+      const updatedUserInfo = await userAPI.deleteUserAvatar();
+      setAvatarDisplayUrl(minioAPI.getImageUrl(updatedUserInfo.avatar, "avatars"));
+    } catch (err) {
+      console.error("delete avatar")
+    }
   };
 
-  const handleNewAvatar = (e) => {
+  const handleNewAvatarSelected = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      //тут что то с файлом сделать, сохранение сразу произвести
-      console.log(file);
+      try {
+        const updatedUserInfo = await userAPI.changeUserAvatar(file);
+        setAvatarDisplayUrl(minioAPI.getImageUrl(updatedUserInfo.avatar, "avatars"));
+      } catch (err) {
+        console.error("selected_avatar")
+      }
     }
   };
 
@@ -67,13 +79,12 @@ const EditProfilePage = () => {
             <img src={avatarUrl} alt="avatar" className="avatar" />
           </span>
           <div className="user-info">
-            {/* тут должно быть имя пользователя который сейчас в системе */}
-            <div>{"username"}</div>
-            <div>{"login"}</div>
+            <div>{JSON.parse(localStorage.getItem("userData"))?.username || "Имя пользователя"}</div>
+            <div>{JSON.parse(localStorage.getItem("userData"))?.login || "Логин"}</div>
           </div>
         </div>
         <ButtonGroup size="sm">
-          <Button className="buttongroup" onClick={handleButtonClick}>
+          <Button className="buttongroup" onClick={handleAvatarChangeClick}>
             Изменить аватар
           </Button>
           <input
@@ -81,7 +92,7 @@ const EditProfilePage = () => {
             accept="image/*"
             ref={inputRef}
             style={{ display: "none" }}
-            onChange={handleNewAvatar}
+            onChange={handleNewAvatarSelected}
           />
           <Button className="buttongroup" onClick={handleDeleteAvatar}>
             Удалить аватар
@@ -126,7 +137,9 @@ const EditProfilePage = () => {
             <Button className="button" type="submit">
               Сохранить изменения
             </Button>
-            <Button className="button" onClick={handleShow}>Удалить аккаунт</Button>
+            <Button className="button" onClick={handleShow}>
+              Удалить аккаунт
+            </Button>
           </div>
           <Modal
             show={show}
@@ -138,7 +151,8 @@ const EditProfilePage = () => {
               <Modal.Title>Удалить аккаунт</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              Вы действительно хотите удалить аккаунт? отменить это действие будет невозможно.
+              Вы действительно хотите удалить аккаунт? отменить это действие
+              будет невозможно.
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
