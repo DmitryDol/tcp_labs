@@ -13,7 +13,6 @@ const Header = ({ showButtons}) => {
 
   const handleLogout = async() => {
     await authAPI.logout();
-    // alert("вы вышли из профиля")
     navigate("/")
   };
    

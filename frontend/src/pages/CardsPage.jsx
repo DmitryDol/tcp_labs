@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import CardView from "../components/CardView";
 import { Button, Form, Card } from "react-bootstrap";
@@ -7,16 +7,34 @@ import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import { FaRegPlusSquare } from "react-icons/fa";
 import CardModal, { CreateCard} from "../components/Cardredact";
 import "./CardsPage.css";
+import { minioAPI, userRoadmapAPI } from "../api/api";
 
-const background2 ="https://repository-images.githubusercontent.com/185094183/ff64fd00-706f-11e9-9b53-d05acb2d0989"
+
 const CardsPage = () => {
   let [isBookmarked, setIsBookmarked] = useState(false);
-  const [modalShow, setModalShow] = React.useState(false);
+  const [modalShow, setModalShow] = useState(false);
+  const location = useLocation();
+  const { id } = useParams();
+  const [background, setBackground] = useState(null);
+
+  useEffect(() => {
+    const getBackground = async () => {
+      console.log(id)
+      let filename = await userRoadmapAPI.getBackgroundFilename(id);
+      console.log(filename)
+      if (filename===undefined)
+        {filename = import.meta.env.VITE_DEFAULT_BACKGROUND}
+      const imageurl = minioAPI.getImageUrl(filename, "backgrounds");
+      setBackground(imageurl);
+    };
+    getBackground();
+  }, [id]);
+  
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
   };
-  const location = useLocation();
+  
   if (location.pathname === "/myroadmaps/cards"){
     isBookmarked = true;
   }
@@ -28,7 +46,7 @@ const CardsPage = () => {
   return (
     <>
       <Header showButtons={true} />
-      <div className="container-flex" style={{ backgroundImage: `url(${background2})`, backgroundSize: 'cover',}}>
+      <div className="container-flex" style={{ backgroundImage: `url(${background})`, backgroundSize: 'cover',}}>
         <Card className="left-card">
           <Card.Header>{"название роадмапа"}</Card.Header>
           <Card.Body>

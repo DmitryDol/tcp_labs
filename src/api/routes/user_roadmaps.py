@@ -56,7 +56,7 @@ async def delete_user_roadmap_link(
     else:
         await UserRoadmapsService.delete_user_roadmap(uow, {"roadmap_id": roadmap_id, "user_id": user_dep['id']})
 
-@router.get("/{roadmap_id}/background", response_model=UserRoadmapDTO)
+@router.get("/{roadmap_id}/background")
 async def get_roadmap_background(
     user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],

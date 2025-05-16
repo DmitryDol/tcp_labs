@@ -1,7 +1,7 @@
 import logging
 
 from api.dependencies.pagination_dependency import PaginationParams
-from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO, UserRoadmapEditDTO
+from dto import RoadmapAddDTO, RoadmapDTO, RoadmapEditDTO, RoadmapExtendedDTO, SimplifiedRoadmapDTO, UserRoadmapEditDTO
 from services.cards import CardsService
 from utils.unitofwork import IUnitOfWork
 from typing import List, Optional
@@ -60,7 +60,7 @@ class RoadmapsService:
         pagination: PaginationParams,
         search: Optional[str] = None, 
         difficulty: Optional[str] = None,
-    ) -> List[RoadmapDTO]:
+    ) -> List[SimplifiedRoadmapDTO]:
         """
         Gets public roadmaps with search and filtering capabilities 
         
@@ -71,7 +71,7 @@ class RoadmapsService:
             limit: Optional limit on the number of roadmaps returned
         
         Returns:
-            List of the RoadmapDTO objects
+            List of the SimplifiedRoadmapDTO objects
         """
         async with uow:
             roadmaps = await uow.roadmaps.find_public_roadmaps(
@@ -80,12 +80,7 @@ class RoadmapsService:
                 pagination=pagination
             )
             simplified_roadmaps = [
-                {
-                    "roadmap_id": roadmap.id,
-                    "title": roadmap.title,
-                    "description": roadmap.description,
-                    "difficulty": roadmap.difficulty.value if hasattr(roadmap.difficulty, 'value') else roadmap.difficulty
-                }
+                SimplifiedRoadmapDTO.model_validate(roadmap, from_attributes=True)
                 for roadmap in roadmaps
             ]
             return simplified_roadmaps
