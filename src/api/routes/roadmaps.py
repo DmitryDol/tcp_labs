@@ -61,7 +61,7 @@ async def edit_roadmap(
     roadmap: RoadmapEditDTO,
     uow: UOWDep
 ):
-    roadmap_info: Optional[RoadmapDTO] = RoadmapsService.get_roadmap(uow, roadmap_id)
+    roadmap_info: Optional[RoadmapDTO] =  await RoadmapsService.get_roadmap(uow, roadmap_id)
 
     if roadmap_info is None:
         raise HTTPException(status_code=404, detail="Roadmap not found")

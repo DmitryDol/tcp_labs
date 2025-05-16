@@ -18,7 +18,7 @@ async def add_card(
     card: CardAddDTO,
     uow: UOWDep,
 ):
-    roadmap_info: Optional[RoadmapDTO] = RoadmapsService.get_roadmap(uow, card.roadmap_id)
+    roadmap_info: Optional[RoadmapDTO] = await RoadmapsService.get_roadmap(uow, card.roadmap_id)
 
     if roadmap_info is None:
         raise HTTPException(status_code=404, detail='Roadmap not found')

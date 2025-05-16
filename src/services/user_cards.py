@@ -36,7 +36,7 @@ class UserCardService:
         
     @staticmethod
     async def link_user_to_cards_in_roadmap(uow: IUnitOfWork, user_id: int, roadmap_id: int):
-        roadmap: Optional[RoadmapDTO] = RoadmapsService.get_roadmap(uow, roadmap_id)
+        roadmap: Optional[RoadmapDTO] = await RoadmapsService.get_roadmap(uow, roadmap_id)
         
         if roadmap is None:
             return None
@@ -53,7 +53,7 @@ class UserCardService:
                     'user_id': user_id,
                     'card_id': card.id
                 }
-                card_id = UserCardService.add_user_card(uow, UserCardAddDTO.model_validate(user_card))
+                card_id = await UserCardService.add_user_card(uow, UserCardAddDTO.model_validate(user_card))
                 card_ids.append(card_id)
             return card_ids
         
