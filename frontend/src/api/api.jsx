@@ -319,7 +319,7 @@ export const userRoadmapAPI = {
       handleError(error, "unlinking user from roadmap");
     }
   },
-  getBackground: async (roadmapId) => {
+  getBackgroundFilename: async (roadmapId) => {
     try {
       const response = await apiClient.get(
         `/api/core/user_roadmaps/${roadmapId}/background`

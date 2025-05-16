@@ -19,12 +19,12 @@ const CardsPage = () => {
 
   useEffect(() => {
     const getBackground = async () => {
-    let filename = await userRoadmapAPI.getBackgroundFilename(id);
-    if (filename===undefined)
-    {filename = import.meta.env.VITE_DEFAULT_BACKGROUND}
-    const imageurl = minioAPI.getImageUrl(filename, "backgrounds");
-    console.log(filename)
-    setBackground(imageurl);
+      let filename = await userRoadmapAPI.getBackgroundFilename(id);
+      if (filename===undefined)
+      {filename = import.meta.env.VITE_DEFAULT_BACKGROUND}
+      const imageurl = minioAPI.getImageUrl(filename, "backgrounds");
+      console.log(filename)
+      setBackground(imageurl);
     };
     const getRoadmapInfo = async () =>{
         const roadmap = await roadmapAPI.getRoadmapById(id);
