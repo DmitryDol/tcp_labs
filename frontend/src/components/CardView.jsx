@@ -6,9 +6,7 @@ import "./CardView.css"
 import { useLocation } from "react-router-dom";
 import { EditCard } from "./Cardredact";
 
-function CardView(cardInfo){
-    const description = "";
-    const mayRedact = true;
+function CardView({cardInfo, mayRedact}){
     const location = useLocation();
     const [modalShow, setModalShow] = React.useState(false);
     const cardToEdit = {}
@@ -18,10 +16,11 @@ function CardView(cardInfo){
     function handleUpdate(){
 
     }
+    if (cardInfo){console.log(cardInfo)} else console.log("aaaaaaa");
     return(
         <Card className="cardcard">
             <Card.Header className="cardhead">
-                <span>{"название карточки"}</span>
+                <span>{cardInfo.title || "Без заголовка"}</span>
                 {location.pathname === "/myroadmaps/cards" && mayRedact && 
                 <div className="settingsgroup">
                 <ButtonGroup>
@@ -37,19 +36,20 @@ function CardView(cardInfo){
             </Card.Header>
             <ListGroup variant="flush">
                 {/* работает только если есть описание */}
-                {description && 
+                {cardInfo.description && 
                 <Accordion className="cardaccordion">
                 <Accordion.Item eventKey="0" >
-                <Accordion.Header>Описание</Accordion.Header>
+                <Accordion.Header>{"Описание"}</Accordion.Header>
                 <Accordion.Body>
-                    {"тут текст описания"}
+                    {cardInfo.description}
                 </Accordion.Body>
                 </Accordion.Item>
                 </Accordion>}
-            {/* по хорошему надо отрисовывать карточки используя массив полученных значений */}
-                <ListGroup.Item><Card.Link href={""}>{"ссылка1"}</Card.Link></ListGroup.Item>
-                <ListGroup.Item><Card.Link href={""}>{"ссылка2"}</Card.Link></ListGroup.Item>
-                <ListGroup.Item><Card.Link href={""}>{"ссылка3"}</Card.Link></ListGroup.Item>
+            {cardInfo.links.map((link, index) => (
+                <ListGroup.Item key={index}><Card.Link href={link.link_content}>{link.link_title}</Card.Link></ListGroup.Item>
+            ))}
+                
+                
             </ListGroup>
             <EditCard 
                 show={modalShow} 

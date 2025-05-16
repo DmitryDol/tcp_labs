@@ -55,7 +55,7 @@ function RoadmapView({ roadmapData }) {
               alignItems: "baseline",
             }}
           >
-            <Card.Text>{"тут сложность"}</Card.Text>
+            <Card.Text>{roadmapData.difficulty}</Card.Text>
             {location.pathname === "/myroadmaps" ? (
               <Dropdown drop="end">
                 <Dropdown.Toggle
