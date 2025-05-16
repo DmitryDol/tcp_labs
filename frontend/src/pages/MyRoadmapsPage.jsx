@@ -1,10 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Header from "../components/Header";
 import RoadmapView from "../components/RoadmapView";
 import CreateRoadmap from "../components/RoadmapRedact";
 import { Pagination } from "react-bootstrap";
 import { Button, Form } from "react-bootstrap";
 import "./RoadmapSearchPage.css";
+import { userRoadmapAPI } from "../api/api";
 
 const background =
   "https://i.pinimg.com/736x/35/a8/19/35a8199c0fffa403c3b03fc5680c5041.jpg";
@@ -12,6 +13,14 @@ const background2 =
   "https://repository-images.githubusercontent.com/185094183/ff64fd00-706f-11e9-9b53-d05acb2d0989";
 
 const MyRoadmapsPage = () => {
+  const [roadmaps, setRoadmaps] = useState([]);
+  useEffect(() => {
+    const fetchRoadmaps = async () => {
+      const roadmapsData = await userRoadmapAPI.getLinkedRoadmaps(limit = 6); 
+      setRoadmaps(roadmapsData);
+    }
+    fetchRoadmaps();
+  }, []); 
   const allRoadmaps = [];
   const totalRoadmaps = 3;
 
