@@ -5,18 +5,25 @@ import { useLocation } from "react-router-dom";
 import {BsBookmark,BsBookmarkFill,BsThreeDotsVertical} from "react-icons/bs";
 import { EditRoadmap } from "./RoadmapRedact";
 import "./RoadmapView.css";
+import { minioAPI, userRoadmapAPI } from "../api/api";
 
-function RoadmapView({ backgroundUrl, roadmapTitle }) {
+function RoadmapView({ roadmapData }) {
   const location = useLocation();
-  const pathWithCards = `${location.pathname}/cards`;
+  const pathWithCards = `${location.pathname}/${roadmapData.id}`;
   const [isBookmarked, setIsBookmarked] = useState(false);
-
+ 
   // тут надо как то получать состояния роадмапа: кем он создан и можно ли редактировать
   let isMade = true;
   let mayRedact = true;
 
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
+  const handleBookmark = async() => {
+    if(isBookmarked==false){
+      await userRoadmapAPI.linkUserToRoadmap(roadmapData.id);
+      setIsBookmarked(!isBookmarked);
+    }
+    else{
+      await userRoadmapAPI.unlinkUserFromRoadmap()
+    }
   };
   let roadmapToEdit
     
@@ -37,7 +44,7 @@ function RoadmapView({ backgroundUrl, roadmapTitle }) {
         <Card.Body className="cardbody">
           <Card.Title style={{ fontSize: "21px" }}>
             <Card.Link href={pathWithCards} className="roadmapname">
-              {roadmapTitle}
+              {roadmapData.title}
             </Card.Link>
           </Card.Title>
           <Card.Footer
@@ -93,7 +100,7 @@ function RoadmapView({ backgroundUrl, roadmapTitle }) {
                 variant="outline-dark"
                 onClick={handleBookmark}
               >
-                {isBookmarked ? <BsBookmarkFill /> : <BsBookmark />}
+                {isBookmarked ?  <BsBookmarkFill /> : <BsBookmark />}
               </Button>
             )}
             <EditRoadmap 
@@ -104,12 +111,12 @@ function RoadmapView({ backgroundUrl, roadmapTitle }) {
             />
           </Card.Footer>
         </Card.Body>
-        <Card.Img src={backgroundUrl} alt="Card image" className="cardimg" />
+        <Card.Img src={minioAPI.getImageUrl('d36563e3-9b4a-44bd-9e14-cd86c0603335.jpg', 'backgrounds')} alt="Card image" className="cardimg" />
       </div>
       <Accordion>
         <Accordion.Item eventKey="0">
           <Accordion.Header>Описание</Accordion.Header>
-          <Accordion.Body>{"тут текст описания"}</Accordion.Body>
+          <Accordion.Body>{roadmapData.description}</Accordion.Body>
         </Accordion.Item>
       </Accordion>
     </Card>

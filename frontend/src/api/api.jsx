@@ -1,5 +1,3 @@
-//TODO change ```create: async (userData) => {``` and other to ```create: async (name, login, password) => {``` and other
-
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -153,7 +151,7 @@ export const roadmapAPI = {
       if (difficulty) params.difficulty = difficulty;
       if (limit) params.limit = limit;
 
-      const response = await apiClient.get("/api/core/roadmaps", { params });
+      const response = await apiClient.get("/api/core/roadmaps/public", { params });
       return response.data;
     } catch (error) {
       handleError(error, "getting public roadmaps");
@@ -270,7 +268,7 @@ export const userRoadmapAPI = {
       const response = await apiClient.get(
         `/api/core/user_roadmaps/${roadmapId}/background`
       );
-      return response.data.background;
+      return response?.data?.background;
     } catch (error) {
       handleError(error, "getting background filename");
     }
@@ -386,7 +384,7 @@ export const cardLinkAPI = {
 
 // --- Image Service (Java Backend - /api/images) ---
 
-const minioAPI = {
+export const minioAPI = {
   uploadImage: async (file, bucket) => {
     const formData = new FormData();
     formData.append("file", file);
