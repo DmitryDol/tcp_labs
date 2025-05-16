@@ -17,16 +17,11 @@ public class JwtUtil {
     private String secretKey;
 
     private SecretKey getKey() {
-//        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         byte[] keybytes = secretKey.getBytes(StandardCharsets.UTF_8);
-        // System.out.println(Keys.hmacShaKeyFor(keybytes).getAlgorithm()); // Removed debug print
-        // System.out.println(Keys.hmacShaKeyFor(keybytes)); // Removed debug print
         return Keys.hmacShaKeyFor(keybytes);
     }
 
     public String validateTokenAndGetUserID(String token){
-        // System.out.println(secretKey);
-        // System.out.println(getKey().toString());
         try{
             Claims claims = Jwts.parser()
                     .verifyWith(getKey())

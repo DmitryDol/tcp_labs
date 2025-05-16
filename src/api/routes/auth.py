@@ -28,6 +28,9 @@ async def create_user(
     user: UserAddDTO,
     uow: UOWDep
 ):
+    already_exist = await UsersService.get_user(uow, login=user.login)
+    if already_exist is not None:
+        raise HTTPException(status_code=409, detail="User with this email already exist")
     user_id = await UsersService.add_user(uow, user)
     return {"user_id": user_id}
 

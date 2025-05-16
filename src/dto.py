@@ -41,6 +41,8 @@ class SimplifiedRoadmapDTO(BaseModel):
     title: str
     description: str
     difficulty: str
+    # current_page: int
+    # last_page: int
 
 class RoadmapAddDTO(BaseModel):
     owner_id: int

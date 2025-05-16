@@ -16,7 +16,7 @@ async def get_user_info(
     user_dep: UserDep,
     uow: UOWDep
 ):
-    user = await UsersService.get_user(uow=uow, filter_by=user_dep['id'])
+    user = await UsersService.get_user(uow, id=user_dep['id'])
     return user
 
 @router.delete(
@@ -56,7 +56,7 @@ async def edit_user(
     uow: UOWDep
 ):
     await UsersService.edit_user(uow, user_dep['id'], user)
-    user_data = await UsersService.get_user(uow, user_dep['id'])
+    user_data = await UsersService.get_user(uow, id=user_dep['id'])
     return {
         "user_id": user_dep['id'], 
         'login': user_data.login, 

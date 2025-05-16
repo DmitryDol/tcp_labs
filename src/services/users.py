@@ -32,10 +32,15 @@ class UsersService:
             await uow.commit()
 
     @staticmethod
-    async def get_user(uow: IUnitOfWork, filter_by: Optional[Dict[str, Any]] = None) -> UserDTO:
+    async def get_user(uow: IUnitOfWork, **filter_by) -> UserDTO:
         async with uow:
-            users = await uow.users.find_one(id=filter_by)
+            users = await uow.users.find_one(**filter_by)
             return users
+        
+    async def get_user_by_login(uow: IUnitOfWork, login: str) -> UserDTO:
+        async with uow:
+            user = await uow.users.find_one(login=login)
+            return user
 
     @staticmethod
     async def get_users(uow: IUnitOfWork, filter_by: Optional[Dict[str, Any]] = None) -> List[UserDTO]:
