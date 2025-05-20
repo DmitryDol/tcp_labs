@@ -1,11 +1,10 @@
+
 from database import async_session_factory
-from models import UserRoadmap
-import asyncio
 from dto import UserRoadmapDTO
+from models import UserRoadmap
 
 
 class UserRoadmap:
-
     @staticmethod
     async def add_user_roadmap(data: list[UserRoadmap]) -> None:
         """
@@ -26,7 +25,7 @@ class UserRoadmap:
         Args:
             user_roadmap_id (int): The ID of the user_roadmap to be deleted.
         Returns:
-            None   
+            None
         """
         async with async_session_factory() as session:
             roadmap = await session.get(UserRoadmap, user_roadmap_id)
@@ -64,5 +63,7 @@ class UserRoadmap:
         """
         async with async_session_factory() as session:
             user_roadmap = await session.get(UserRoadmap, user_roadmap_id)
-            roadmap_dto = UserRoadmapDTO.model_validate(user_roadmap, from_attributes=True)
+            roadmap_dto = UserRoadmapDTO.model_validate(
+                user_roadmap, from_attributes=True
+            )
             return roadmap_dto

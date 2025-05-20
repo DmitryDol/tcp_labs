@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -7,10 +7,12 @@ class TokenDTO(BaseModel):
     access_token: str
     token_type: str
 
+
 class LoginDTO(TokenDTO):
     login: str
     username: str
     avatar: str
+
 
 class UserAuthDTO(BaseModel):
     id: int
@@ -19,10 +21,12 @@ class UserAuthDTO(BaseModel):
     password_hash: str
     avatar: str
 
+
 class UserAddDTO(BaseModel):
     name: str
     login: str
     password_hash: str
+
 
 class UserDTO(BaseModel):
     id: int
@@ -31,10 +35,12 @@ class UserDTO(BaseModel):
     created_at: datetime
     avatar: str
 
+
 class UserEditDTO(BaseModel):
-    name: Optional[str] = None
-    password_hash: Optional[str] = None
-    avatar: Optional[str] = None
+    name: str | None = None
+    password_hash: str | None = None
+    avatar: str | None = None
+
 
 class SimplifiedRoadmapDTO(BaseModel):
     id: int
@@ -44,6 +50,7 @@ class SimplifiedRoadmapDTO(BaseModel):
     # current_page: int
     # last_page: int
 
+
 class RoadmapAddDTO(BaseModel):
     owner_id: int
     title: str
@@ -52,74 +59,97 @@ class RoadmapAddDTO(BaseModel):
     edit_permission: str
     visibility: str
 
+
 class RoadmapDTO(RoadmapAddDTO):
     id: int
     created_at: datetime
     updated_at: datetime
 
+
 class RoadmapEditDTO(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    difficulty: Optional[str] = None
-    edit_permission: Optional[str] = None
-    visibility: Optional[str] = None
-   
+    title: str | None = None
+    description: str | None = None
+    difficulty: str | None = None
+    edit_permission: str | None = None
+    visibility: str | None = None
+
+
 class CardAddDTO(BaseModel):
     roadmap_id: int
     title: str
-    description: Optional[str]
+    description: str | None
     order_position: int
+
 
 class CardDTO(CardAddDTO):
     id: int
     created_at: datetime
     updated_at: datetime
 
+
 class CardEditDTO(BaseModel):
-    title: Optional[str]
-    description: Optional[str]
-    order_position: Optional[int]
+    title: str | None
+    description: str | None
+    order_position: int | None
+
 
 class UserRoadmapAddDTO(BaseModel):
     user_id: int
     roadmap_id: int
 
+
 class UserRoadmapAddExtendedDTO(UserRoadmapAddDTO):
     card_ids: list[int]
+
 
 class UserRoadmapDTO(UserRoadmapAddDTO):
     background: str
 
+
 class BackgroundDTO(BaseModel):
     background: str
 
+
 class UserRoadmapEditDTO(BaseModel):
     background: str
+
 
 class UserCardAddDTO(BaseModel):
     user_id: int
     card_id: int
 
+
 class UserCardDTO(UserCardAddDTO):
     status: str
 
+
 class UserCardEditDTO(BaseModel):
     status: str
+
 
 class CardLinkAddDTO(BaseModel):
     card_id: int
     link_title: str
     link_content: str
 
+
 class CardLinkDTO(CardLinkAddDTO):
     id: int
 
+
 class CardLinkEditDTO(BaseModel):
-    link_title: Optional[str]
-    link_content: Optional[str]
+    link_title: str | None
+    link_content: str | None
+
 
 class CardExtendedDTO(CardDTO):
-    links: list[Optional[CardLinkDTO]]
+    links: list[CardLinkDTO | None]
+
 
 class RoadmapExtendedDTO(RoadmapDTO):
-    cards: list[Optional[CardExtendedDTO]]
+    cards: list[CardExtendedDTO | None]
+
+
+class PaginatedRoadmapsDTO(BaseModel):
+    roadmaps: list[SimplifiedRoadmapDTO | None]
+    total_pages: int

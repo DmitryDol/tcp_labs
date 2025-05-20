@@ -1,11 +1,11 @@
-from typing import Annotated, Any, Dict, Optional, Union, cast
-from fastapi import Form, HTTPException, Request
-from fastapi.security import OAuth2
-from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
-from fastapi.security.utils import get_authorization_scheme_param
-from typing_extensions import Doc
-from starlette import status
+from typing import Annotated, Any, cast
 
+from fastapi import HTTPException, Request
+from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
+from fastapi.security import OAuth2
+from fastapi.security.utils import get_authorization_scheme_param
+from starlette import status
+from typing_extensions import Doc
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2):
@@ -21,7 +21,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
             ),
         ],
         scheme_name: Annotated[
-            Optional[str],
+            str | None,
             Doc(
                 """
                 Security scheme name.
@@ -31,7 +31,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
             ),
         ] = None,
         scopes: Annotated[
-            Optional[Dict[str, str]],
+            dict[str, str] | None,
             Doc(
                 """
                 The OAuth2 scopes that would be required by the *path operations* that
@@ -40,7 +40,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
             ),
         ] = None,
         description: Annotated[
-            Optional[str],
+            str | None,
             Doc(
                 """
                 Security scheme description.
@@ -76,24 +76,24 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
             password=cast(Any, {"tokenUrl": tokenUrl, "scopes": scopes})
         )
         super().__init__(
-            flows=flows, 
-            scheme_name=scheme_name, 
+            flows=flows,
+            scheme_name=scheme_name,
             description=description,
             auto_error=auto_error,
         )
 
-    async def __call__(self, request: Request) -> Optional[str]:
+    async def __call__(self, request: Request) -> str | None:
         header_authorization: str = request.headers.get("Authorization")
         cookie_authorization: str = request.cookies.get("access_token")
-        
+
         # Priority to header Authorization
         authorization = header_authorization
-        
+
         if not authorization and cookie_authorization:
             authorization = f"Bearer {cookie_authorization}"
-        
+
         scheme, param = get_authorization_scheme_param(authorization)
-        
+
         if not authorization or scheme.lower() != "bearer":
             if self.auto_error:
                 raise HTTPException(
@@ -103,10 +103,8 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
                 )
             else:
                 return None
-                
+
         return param
-    
-
-oauth2_bearer = OAuth2PasswordBearerWithCookie(tokenUrl='auth/token')
 
 
+oauth2_bearer = OAuth2PasswordBearerWithCookie(tokenUrl="auth/token")

@@ -1,13 +1,12 @@
+
 from sqlalchemy import insert, select
+
 from database import async_session_factory
-from models import User
-import asyncio
-from faker import Faker
 from dto import UserDTO
+from models import User
 
 
 class Users:
-
     @staticmethod
     async def add_user(user: User) -> None:
         """
@@ -43,11 +42,11 @@ class Users:
         Args:
             user_id (int): The ID of the user to be deleted.
         Returns:
-            None   
+            None
         """
         async with async_session_factory() as session:
             user = await session.get(User, user_id)
-            if user: 
+            if user:
                 await session.delete(user)
                 await session.commit()
 
@@ -70,7 +69,7 @@ class Users:
             if user:
                 for key, value in params.items():
                     setattr(user, key, value)
-            await session.commit() 
+            await session.commit()
 
     @staticmethod
     async def get_user_info(user_id: int) -> UserDTO:
@@ -85,7 +84,7 @@ class Users:
             user = await session.get(User, user_id)
             user_dto = UserDTO.model_validate(user, from_attributes=True)
             return user_dto
-        
+
     @staticmethod
     async def get_user_info_by_login(login: str) -> UserDTO | None:
         async with async_session_factory() as session:
@@ -95,6 +94,6 @@ class Users:
 
             if user is None:
                 return None
-            
+
             user_dto = UserDTO.model_validate(user, from_attributes=True)
             return user_dto

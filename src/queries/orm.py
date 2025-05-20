@@ -1,10 +1,8 @@
-from sqlalchemy import text, insert, inspect
+from database import async_engine
 from models import *
-from database import async_engine, async_session_factory
 
 
 class AsyncORM:
-
     @staticmethod
     async def create_tables():
         async with async_engine.begin() as conn:

@@ -1,11 +1,10 @@
+
 from database import async_session_factory
-from models import Card
-import asyncio
 from dto import CardDTO
+from models import Card
 
 
 class Card:
-
     @staticmethod
     async def add_card(data: list[Card]) -> None:
         """
@@ -26,7 +25,7 @@ class Card:
         Args:
             card_id (int): The ID of the card to be deleted.
         Returns:
-            None   
+            None
         """
         async with async_session_factory() as session:
             card = await session.get(Card, card_id)

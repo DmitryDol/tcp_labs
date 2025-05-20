@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
-from api.routes import auth, roadmaps, users, cards, card_links, user_roadmaps
-from config import settings
+from api.routes import auth, card_links, cards, roadmaps, user_roadmaps, users
 
 api_router = APIRouter()
 api_router.include_router(auth.router)

@@ -1,11 +1,10 @@
+
 from database import async_session_factory
-from models import Roadmap
-import asyncio
 from dto import RoadmapDTO
+from models import Roadmap
 
 
 class Roadmap:
-
     @staticmethod
     async def add_roadmap(data: list[Roadmap]) -> None:
         """
@@ -26,7 +25,7 @@ class Roadmap:
         Args:
             roadmap_id (int): The ID of the roadmap to be deleted.
         Returns:
-            None   
+            None
         """
         async with async_session_factory() as session:
             roadmap = await session.get(Roadmap, roadmap_id)
@@ -47,7 +46,7 @@ class Roadmap:
                 edit_permission (str): The edit permission of the roadmap.
                 visibility (str): The visibility of the roadmap.
         Kwargs:
-        
+
         Returns:
             None
         """
@@ -60,14 +59,14 @@ class Roadmap:
 
     @staticmethod
     async def get_roadmap_info(roadmap_id) -> RoadmapDTO:
-         """
+        """
         Returns roadmap information based on the provided user ID.
         Args:
             roadmap_id (int): The ID of the roadmap to return.
         Returns:
             UsersDTO: A data transfer object containing the roadmap's information.
         """
-         async with async_session_factory() as session:
+        async with async_session_factory() as session:
             roadmap = await session.get(Roadmap, roadmap_id)
             roadmap_dto = RoadmapDTO.model_validate(roadmap, from_attributes=True)
             return roadmap_dto

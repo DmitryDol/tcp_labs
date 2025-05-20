@@ -1,12 +1,9 @@
-from sqlalchemy import text, insert
-from database import async_session_factory, async_engine
-from models import CardLink
-import asyncio
+from database import async_session_factory
 from dto import CardLinkDTO
+from models import CardLink
 
 
 class CardLink:
-
     @staticmethod
     async def add_card_link(data: list[CardLink]) -> None:
         """
@@ -27,7 +24,7 @@ class CardLink:
         Args:
             card_link_id (int): The ID of the card_link to be deleted.
         Returns:
-            None   
+            None
         """
         async with async_session_factory() as session:
             roadmap = await session.get(CardLink, card_link_id)

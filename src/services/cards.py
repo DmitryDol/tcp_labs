@@ -1,4 +1,4 @@
-from typing import Optional
+
 from dto import CardAddDTO, CardDTO, CardEditDTO, CardExtendedDTO
 from utils.unitofwork import IUnitOfWork
 
@@ -13,7 +13,7 @@ class CardsService:
             return card_id
 
     @staticmethod
-    async def edit_card(uow: IUnitOfWork, card_id: int , card: CardEditDTO):
+    async def edit_card(uow: IUnitOfWork, card_id: int, card: CardEditDTO):
         card_dict = card.model_dump(exclude_unset=True)
         async with uow:
             await uow.cards.edit_one(card_id, card_dict)
@@ -24,33 +24,37 @@ class CardsService:
         async with uow:
             cards = await uow.cards.find_all()
             return cards
-        
+
     @staticmethod
-    async def get_card(uow: IUnitOfWork, card_id) -> Optional[CardDTO]:
+    async def get_card(uow: IUnitOfWork, card_id) -> CardDTO | None:
         async with uow:
             card = await uow.cards.find_one(card_id)
             return card
-        
+
     @staticmethod
     async def delete_card(uow: IUnitOfWork, card_id: int):
         async with uow:
             card = await uow.cards.delete_one(card_id)
             await uow.commit()
             return card
-        
+
     @staticmethod
-    async def get_card_extended(uow: IUnitOfWork, card_id: int) -> Optional[CardExtendedDTO]:
+    async def get_card_extended(
+        uow: IUnitOfWork, card_id: int
+    ) -> CardExtendedDTO | None:
         async with uow:
             card = await uow.cards.find_one(id=card_id)
-            
+
             if card is None:
                 return None
-            
+
             card_dict = card.model_dump()
             card_links = await uow.card_links.find_all({"card_id": card.id})
             if card_links:
                 card_dict["links"] = [card_link.model_dump() for card_link in card_links]
             else:
                 card_dict["links"] = []
-            extended_card = CardExtendedDTO.model_validate(card_dict, from_attributes=True)
+            extended_card = CardExtendedDTO.model_validate(
+                card_dict, from_attributes=True
+            )
             return extended_card

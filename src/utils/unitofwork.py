@@ -1,42 +1,37 @@
 from abc import ABC, abstractmethod
-from typing import Type
 
 from database import async_session_factory
-from repositories.users import UserRepository
-from repositories.roadmaps import RoadmapRepository
+from repositories.card_links import CardLinkRepository
 from repositories.cards import CardRepository
+from repositories.roadmaps import RoadmapRepository
 from repositories.user_cards import UserCardRepository
 from repositories.user_roadmaps import UserRoadmapRepository
-from repositories.card_links import CardLinkRepository
+from repositories.users import UserRepository
+
 
 # https://github1s.com/cosmicpython/code/tree/chapter_06_uow
 class IUnitOfWork(ABC):
-    users: Type[UserRepository]
-    roadmaps: Type[RoadmapRepository]
-    cards: Type[CardRepository]
-    user_cards: Type[UserCardRepository]
-    user_roadmaps: Type[UserRoadmapRepository]
-    card_links: Type[CardLinkRepository]
-    
-    @abstractmethod
-    def __init__(self):
-        ...
+    users: type[UserRepository]
+    roadmaps: type[RoadmapRepository]
+    cards: type[CardRepository]
+    user_cards: type[UserCardRepository]
+    user_roadmaps: type[UserRoadmapRepository]
+    card_links: type[CardLinkRepository]
 
     @abstractmethod
-    async def __aenter__(self):
-        ...
+    def __init__(self): ...
 
     @abstractmethod
-    async def __aexit__(self, *args):
-        ...
+    async def __aenter__(self): ...
 
     @abstractmethod
-    async def commit(self):
-        ...
+    async def __aexit__(self, *args): ...
 
     @abstractmethod
-    async def rollback(self):
-        ...
+    async def commit(self): ...
+
+    @abstractmethod
+    async def rollback(self): ...
 
 
 class UnitOfWork:
