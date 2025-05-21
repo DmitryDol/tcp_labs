@@ -9,7 +9,7 @@ class TokenDTO(BaseModel):
 
 
 class LoginDTO(TokenDTO):
-    id: id
+    id: int
     login: str
     username: str
     avatar: str
