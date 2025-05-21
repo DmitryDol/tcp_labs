@@ -10,6 +10,8 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+from config import settings
+
 
 # revision identifiers, used by Alembic.
 revision: str = '0b0476ca9dfb'
@@ -26,7 +28,7 @@ def upgrade() -> None:
     sa.Column('password_hash', sa.String(), nullable=False),
     sa.Column('name', sa.String(length=256), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('avatar', sa.String(), server_default=sa.text("'your_default_user_avatar_name_from_MinIo'"), nullable=True),
+    sa.Column('avatar', sa.String(), server_default=sa.text(f"'{settings.DEFAULT_AVATAR}'"), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('login')
     )
@@ -58,7 +60,7 @@ def upgrade() -> None:
     op.create_table('user_roadmaps',
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('roadmap_id', sa.Integer(), nullable=False),
-    sa.Column('background', sa.String(), server_default=sa.text("'your_default_roadmap_background_from_MinIo'"), nullable=False),
+    sa.Column('background', sa.String(), server_default=sa.text(f"'{settings.DEFAULT_BACKGROUND}'"), nullable=False),
     sa.ForeignKeyConstraint(['roadmap_id'], ['roadmaps.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('user_id', 'roadmap_id')

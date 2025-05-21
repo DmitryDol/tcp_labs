@@ -74,12 +74,13 @@ export const authAPI = {
 
       localStorage.setItem("accessToken", response.access_token);
       const userData = {
+        id: response.data.user_id,
         login: response.data.login,
         username: response.data.username,
       };
 
       localStorage.setItem("userData", JSON.stringify(userData));
-      localStorage.setItem("avatar", response.data.avatar)
+      localStorage.setItem("avatar", response.data.avatar);
       return response.data;
     } catch (error) {
       handleError(error, "logging in");
@@ -117,11 +118,12 @@ export const userAPI = {
     try {
       const response = await apiClient.get("/api/core/users");
       userData = {
+        id: response.data.user_id,
         login: response.data.login,
         username: response.data.username,
       };
       localStorage.setItem("userData", JSON.stringify(userData));
-      localStorage.setItem("avatar", response.data.avatar)
+      localStorage.setItem("avatar", response.data.avatar);
       return response.data;
     } catch (error) {
       handleError(error, "getting user info");
@@ -148,9 +150,9 @@ export const userAPI = {
       // Обновляем userData в localStorage, если бэкенд возвращает актуальные username и login
       // Предполагается, что бэкенд возвращает { login, username, ... }
       if (response.data && response.data.login && response.data.username) {
-        const userData = { 
-            login: response.data.login,
-            username: response.data.username,
+        const userData = {
+          login: response.data.login,
+          username: response.data.username,
         };
         localStorage.setItem("userData", JSON.stringify(userData));
       }
@@ -161,17 +163,15 @@ export const userAPI = {
   },
   changeUserAvatar: async (file) => {
     try {
-      // currentAvatar = userAPI.getUserInfo().avatar
-      const currentAvatar = localStorage.getItem('avatar')
-      if (currentAvatar && currentAvatar !== import.meta.env.VITE_DEFAULT_AVATAR_FILENAME) {
+      const currentAvatar = localStorage.getItem("avatar");
+      if (currentAvatar != import.meta.env.VITE_DEFAULT_AVATAR) {
         await minioAPI.deleteImage(currentAvatar, "avatars");
       }
       const newAvatar = await minioAPI.uploadImage(file, "avatars");
-      const response = await apiClient.put(
-        `/api/core/users`,
-        { avatar: newAvatar.filename }
-      );
-      localStorage.setItem('avatar', response.data.filename)
+      const response = await apiClient.put("/api/core/users/avatar", {
+        avatar: newAvatar.filename,
+      });
+      localStorage.setItem("avatar", newAvatar.filename);
       return response.data;
     } catch (error) {
       handleError(error, "changing user avatar");
@@ -179,21 +179,18 @@ export const userAPI = {
   },
   deleteUserAvatar: async () => {
     try {
-      const currentAvatar = localStorage.getItem("avatar")
-      const defaultAvatar = import.meta.env.VITE_DEFAULT_AVATAR_FILENAME
-      if (currentAvatar && currentAvatar !== defaultAvatarFilename) {
+      const currentAvatar = localStorage.getItem("avatar");
+      if (currentAvatar != import.meta.env.VITE_DEFAULT_AVATAR) {
         await minioAPI.deleteImage(currentAvatar, "avatars");
       }
-      const response = await apiClient.patch(
-        `/api/core/users`,
-        { avatar: defaultAvatarFilename }
-      );
-      localStorage.setItem('avatar', defaultAvatarFilename);
+      await apiClient.delete("/api/core/users/avatar");
+      const response = await apiClient.get("/api/core/users/avatar");
+      localStorage.setItem("avatar", response.data?.avatar);
       return response.data;
     } catch (error) {
-      handleError(error, "deleting user avatar")
+      handleError(error, "deleting user avatar");
     }
-  }
+  },
 };
 
 // --- Roadmaps ---
@@ -208,7 +205,9 @@ export const roadmapAPI = {
       if (limit) params.limit = limit;
       if (page) params.page = page;
 
-      const response = await apiClient.get("/api/core/roadmaps/public", { params });
+      const response = await apiClient.get("/api/core/roadmaps/public", {
+        params,
+      });
       return response.data;
     } catch (error) {
       handleError(error, "getting public roadmaps");
@@ -311,11 +310,9 @@ export const userRoadmapAPI = {
       handleError(error, "linking user to roadmap");
     }
   },
-  unlinkUserFromRoadmap: async (roadmapId, userId) => {
+  unlinkUserFromRoadmap: async (roadmapId) => {
     try {
-      await apiClient.delete(
-        `/api/core/user_roadmaps/${roadmapId}/users/${userId}`
-      );
+      await apiClient.delete(`/api/core/user_roadmaps/${roadmapId}`);
       return true;
     } catch (error) {
       handleError(error, "unlinking user from roadmap");
@@ -327,7 +324,6 @@ export const userRoadmapAPI = {
         `/api/core/user_roadmaps/${roadmapId}/background`
       );
       return response?.data?.background;
-      
     } catch (error) {
       handleError(error, "getting background filename");
     }
@@ -335,11 +331,14 @@ export const userRoadmapAPI = {
   changeRoadmapBackground: async (roadmapId, file) => {
     try {
       currentBackground = userRoadmapAPI.getBackgroundFilename(roadmapId);
-      await minioAPI.deleteImage(currentBackground, "backgrounds");
-      const background = await minioAPI.uploadImage(file, "backgrounds").filename;
+      if (currentBackground != import.meta.env.VITE_DEFAULT_BACKGROUND) {
+        await minioAPI.deleteImage(currentBackground, "backgrounds");
+      }
+      const background = await minioAPI.uploadImage(file, "backgrounds")
+        .filename;
       const response = await apiClient.put(
         `/api/core/user_roadmaps/${roadmapId}/background`,
-        { background }
+        {"background": background }
       );
       return response.data;
     } catch (error) {

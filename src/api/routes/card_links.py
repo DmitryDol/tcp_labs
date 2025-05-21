@@ -11,6 +11,7 @@ from services.roadmaps import RoadmapsService
 router = APIRouter(prefix="/card_links", tags=["card_links"])
 
 
+#TODO check is user linked to this roadmap
 @router.delete("/{card_link_id}", status_code=204)
 async def delete_card_link(
     user_dep: UserDep,
@@ -22,7 +23,7 @@ async def delete_card_link(
     if curr_card_link is None:
         raise HTTPException(status_code=404, detail="Card link not found")
 
-    card_id = (await CardLinksService.get_card_links(uow)).card_id
+    card_id = (await CardLinksService.get_card_link(uow, card_link_id)).card_id
     roadmap_id = (await CardsService.get_card(uow, card_id)).roadmap_id
     roadmap = await RoadmapsService.get_roadmap(uow, roadmap_id)
 
@@ -34,7 +35,7 @@ async def delete_card_link(
 
     card_link_id = await CardLinksService.delete_card_link(uow, card_link_id)
 
-
+#TODO check is user linked to this roadmap
 @router.patch("/{card_link_id}")
 async def edit_card_link(
     user_dep: UserDep,
@@ -47,7 +48,7 @@ async def edit_card_link(
     if curr_card_link is None:
         raise HTTPException(status_code=404, detail="Card link not found")
 
-    card_id = (await CardLinksService.get_card_links(uow)).card_id
+    card_id = (await CardLinksService.get_card_link(uow, card_link_id)).card_id
     roadmap_id = (await CardsService.get_card(uow, card_id)).roadmap_id
     roadmap = await RoadmapsService.get_roadmap(uow, roadmap_id)
 
