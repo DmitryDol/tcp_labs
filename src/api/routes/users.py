@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Cookie, Response
 
 from api.dependencies.dependencies import RedisDep, UOWDep, UserDep
-from dto import UserDTO, UserEditDTO
+from dto import AvatarDTO, UserDTO, UserEditDTO
 from services.tokens import TokensService
 from services.users import UsersService
 from utils.utils import hash_password
@@ -53,3 +53,18 @@ async def edit_user(user_dep: UserDep, user: UserEditDTO, uow: UOWDep):
         "login": user_data.login,
         "username": user_data.name,
     }
+
+
+@router.delete("/avatar")
+async def delete_user_avatar(user_dep: UserDep, uow: UOWDep):
+    await UsersService.delete_avatar(uow, user_dep["id"])
+
+
+@router.put("/avatar")
+async def change_user_avatar(user_dep: UserDep, avatar: AvatarDTO, uow: UOWDep):
+    await UsersService.edit_avatar(uow, avatar, user_dep["id"])
+
+
+@router.get('/avatar')
+async def get_user_avatar(user_dep: UserDep, uow: UOWDep):
+    return await UsersService.get_avatar(uow, user_dep['id'])

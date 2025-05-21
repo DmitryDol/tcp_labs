@@ -30,7 +30,7 @@ class CardLinksService:
     @staticmethod
     async def get_card_link(uow: IUnitOfWork, card_link_id: int) -> CardLinkDTO:
         async with uow:
-            card_links = await uow.card_links.find_one(card_link_id)
+            card_links = await uow.card_links.find_one(id=card_link_id)
             return card_links
 
     @staticmethod

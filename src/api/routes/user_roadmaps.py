@@ -124,7 +124,7 @@ async def get_roadmap_background(
 async def edit_roadmap_background(
     user_dep: UserDep,
     roadmap_id: Annotated[int, Path(title="Roadmap id")],
-    background: str,
+    background: BackgroundDTO,
     uow: UOWDep,
 ):
     roadmap = await RoadmapsService.get_roadmap(uow, roadmap_id)

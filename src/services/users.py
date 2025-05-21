@@ -1,6 +1,7 @@
 from typing import Any
 
-from dto import UserAddDTO, UserAuthDTO, UserDTO, UserEditDTO
+from config import settings
+from dto import AvatarDTO, UserAddDTO, UserAuthDTO, UserDTO, UserEditDTO
 from utils.unitofwork import IUnitOfWork
 from utils.utils import hash_password, verify_password
 
@@ -59,3 +60,24 @@ class UsersService:
             user = await uow.users.delete_one(user_id)
             await uow.commit()
             return user
+
+    @staticmethod
+    async def delete_avatar(uow: IUnitOfWork, user_id: int):
+        async with uow:
+            user: UserDTO = await uow.users.find_one(id=user_id)
+            if user.avatar == settings.DEFAULT_AVATAR:
+                return False
+            await uow.users.edit_one(user_id, {"avatar": settings.DEFAULT_AVATAR})
+            return True
+
+    @staticmethod
+    async def edit_avatar(uow: IUnitOfWork, avatar: AvatarDTO, user_id: int):
+        async with uow:
+            user = await uow.users.edit_one(user_id, avatar)
+            return user
+        
+    @staticmethod
+    async def get_avatar(uow: IUnitOfWork, user_id: int):
+        async with uow:
+            user: UserDTO = await uow.users.find_one(id=user_id)
+            return AvatarDTO.model_validate(user, from_attributes=True)
