@@ -91,7 +91,7 @@ public class MinioService {
     public InputStream getFile(String bucket, String filename, String userId) throws Exception {
         validateBucket(bucket);
 
-        if (!isFileOwnedByUser(bucket, filename, userId) && "backgrounds".equals(bucket)) {
+        if (!isFileOwnedByUser(bucket, filename, userId) && "backgrounds".equals(bucket) && !filename.equals(defaultBackground)) {
             throw new AccessDeniedException("Access denied to file '" + filename + "' in bucket '" + bucket + "'");
         }
 
@@ -110,7 +110,7 @@ public class MinioService {
         }
     }
 
-    public void deleteFile(String bucket, String filename, String userId) throws Exception {
+    public void  deleteFile(String bucket, String filename, String userId) throws Exception {
         validateBucket(bucket);
 
         if (("avatars".equals(bucket) && defaultAvatar.equals(filename)) || ("backgrounds".equals(bucket) && defaultBackground.equals(filename))){
