@@ -200,12 +200,13 @@ export const userAPI = {
 export const roadmapAPI = {
   getPublic: async (searchParams = {}) => {
     try {
-      const { search, difficulty, limit } = searchParams;
+      const { search, difficulty, limit, page } = searchParams;
 
       const params = {};
       if (search) params.search = search;
       if (difficulty) params.difficulty = difficulty;
       if (limit) params.limit = limit;
+      if (page) params.page = page;
 
       const response = await apiClient.get("/api/core/roadmaps/public", { params });
       return response.data;
@@ -284,12 +285,13 @@ export const roadmapAPI = {
 export const userRoadmapAPI = {
   getLinkedRoadmaps: async (searchParams = {}) => {
     try {
-      const { search, difficulty, limit } = searchParams;
+      const { search, difficulty, limit, page } = searchParams;
 
       const params = {};
       if (search) params.search = search;
       if (difficulty) params.difficulty = difficulty;
       if (limit) params.limit = limit;
+      if (page) params.page = page;
 
       const response = await apiClient.get("/api/core/user_roadmaps", {
         params,
@@ -325,6 +327,7 @@ export const userRoadmapAPI = {
         `/api/core/user_roadmaps/${roadmapId}/background`
       );
       return response?.data?.background;
+      
     } catch (error) {
       handleError(error, "getting background filename");
     }

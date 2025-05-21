@@ -20,7 +20,6 @@ const Header = ({ showButtons}) => {
       if (filename === undefined){
         filename = import.meta.env.VITE_DEFAULT_AVATAR
       }
-      console.log(localStorage.getItem("avatar") == "undefined")
       const imageUrl = minioAPI.getImageUrl(filename, "avatars")
       setAvatar(imageUrl)
     };
@@ -45,7 +44,6 @@ const Header = ({ showButtons}) => {
               <Nav.Link href="/roadmapsearch" className="menu-button">Поиск роадмапов</Nav.Link>
               <NavDropdown title="Профиль" style={{backgroundColor:'#8a2be2'}} id="collapsible-nav-dropdown">
                 <NavDropdown.Item style={{color:'#fff', backgroundColor: '#8a2be2', fontSize:"15px"}}>
-                  {/* тут должно быть имя и логин пользователя, который в системе */}
                   <div>{JSON.parse(localStorage.getItem('userData')).username}</div>
                   <div>{JSON.parse(localStorage.getItem('userData')).login}</div>
                 </NavDropdown.Item>

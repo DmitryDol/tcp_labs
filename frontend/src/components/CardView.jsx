@@ -16,7 +16,6 @@ function CardView({cardInfo, mayRedact}){
     function handleUpdate(){
 
     }
-    if (cardInfo){console.log(cardInfo)} else console.log("aaaaaaa");
     return(
         <Card className="cardcard">
             <Card.Header className="cardhead">

@@ -13,31 +13,24 @@ const background2 =
   "https://repository-images.githubusercontent.com/185094183/ff64fd00-706f-11e9-9b53-d05acb2d0989";
 
 const MyRoadmapsPage = () => {
+  const itemsPerPage = 1;
   const [roadmaps, setRoadmaps] = useState([]);
+  const [activePage, setActivePage] = useState(1);
+  const [searchText, setSearchText] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     const fetchRoadmaps = async () => {
-      const roadmapsData = await userRoadmapAPI.getLinkedRoadmaps(limit = 6); 
+      const params = {
+        limit: itemsPerPage,
+        page: activePage,
+      };
+
+      const roadmapsData = await userRoadmapAPI.getLinkedRoadmaps(params);
       setRoadmaps(roadmapsData);
-    }
+    };
     fetchRoadmaps();
-  }, []); 
-  const allRoadmaps = [];
-  const totalRoadmaps = 3;
-
-  for (let i = 0; i < totalRoadmaps; i++) {
-    allRoadmaps.push({
-      backgroundUrl: i % 2 === 0 ? background : background2,
-      roadmapTitle: "hhhhhhhhhhhhhhhhh",
-    });
-  }
-  const itemsPerPage = 6;
-  const [activePage, setActivePage] = useState(1);
-
-  const indexOfLastItem = activePage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentRoadmaps = allRoadmaps.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(allRoadmaps.length / itemsPerPage);
+  }, [itemsPerPage, activePage]);
 
   const handlePageChange = (pageNumber) => {
     setActivePage(pageNumber);
@@ -45,9 +38,7 @@ const MyRoadmapsPage = () => {
 
   const [modalShow, setModalShow] = React.useState(false);
 
-  const handleCreateRoadmap=()=>{
-
-  }
+  const handleCreateRoadmap = () => {};
 
   return (
     <>
@@ -69,36 +60,42 @@ const MyRoadmapsPage = () => {
         >
           Создать роадмап
         </Button>
-        <CreateRoadmap 
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        onSave={handleCreateRoadmap}
+        <CreateRoadmap
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          onSave={handleCreateRoadmap}
         />
       </div>
       <div className="roadmaps-container">
-        {currentRoadmaps.map((roadmap, index) => (
-          <RoadmapView
-            key={index + indexOfFirstItem}
-            backgroundUrl={roadmap.backgroundUrl}
-            roadmapTitle={roadmap.roadmapTitle}
-          />
-        ))}
+        {roadmaps.roadmaps?.length > 0 ? (
+          roadmaps.roadmaps.map((roadmap, index) => (
+            <RoadmapView 
+              key={roadmap.id || index}
+              roadmapData={roadmap}
+            />
+          ))
+        ) : (
+          <div className="text-center w-100 my-5">
+            <p>Вы еще не добавили себе роадмапов</p>
+          </div>
+        )}
       </div>
       <hr style={{ opacity: ".75", marginLeft: "20px", marginRight: "20px" }} />
       <div
         style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
       >
-        <Pagination>
-          {[...Array(totalPages)].map((_, index) => (
+      <Pagination>
+        {roadmaps.total_pages > 0 &&
+          [...Array(roadmaps.total_pages)].map((_, index) => (
             <Pagination.Item
               key={index + 1}
               active={index + 1 === activePage}
-              onClick={() => handlePageChange(index + 1)}
+              onClick={() => setActivePage(index + 1)}
             >
               {index + 1}
             </Pagination.Item>
           ))}
-        </Pagination>
+      </Pagination>
       </div>
     </>
   );

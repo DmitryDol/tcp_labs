@@ -15,11 +15,12 @@ function RoadmapView({ roadmapData }) {
   useEffect(() => {
     const getBackground = async () => {
       let filename = await userRoadmapAPI.getBackgroundFilename(roadmapData.id);
-      if (filename===undefined)
+      if (filename === undefined)
       {filename = import.meta.env.VITE_DEFAULT_BACKGROUND}
       const imageurl = minioAPI.getImageUrl(filename, "backgrounds");
       console.log(filename)
-      setBackground(imageurl);}
+      setBackground(imageurl);
+    }
       getBackground()
     },[roadmapData.id])
 
@@ -37,6 +38,7 @@ function RoadmapView({ roadmapData }) {
       await userRoadmapAPI.unlinkUserFromRoadmap()
     }
   };
+  
   let roadmapToEdit
     
   const handleUpdateRoadmap=()=>{

@@ -20,10 +20,10 @@ const CardsPage = () => {
   useEffect(() => {
     const getBackground = async () => {
       let filename = await userRoadmapAPI.getBackgroundFilename(id);
+      console.log(filename)
       if (filename===undefined)
       {filename = import.meta.env.VITE_DEFAULT_BACKGROUND}
       const imageurl = minioAPI.getImageUrl(filename, "backgrounds");
-      console.log(filename)
       setBackground(imageurl);
     };
     const getRoadmapInfo = async () =>{
@@ -33,9 +33,7 @@ const CardsPage = () => {
     getBackground();
     getRoadmapInfo();
   }, [id]);
-  useEffect(() => {
-    console.log(roadmapinfo);
-  }, [roadmapinfo]);
+
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
