@@ -9,7 +9,7 @@ class TokenDTO(BaseModel):
 
 
 class LoginDTO(TokenDTO):
-    id: id
+    id: int
     login: str
     username: str
     avatar: str
@@ -109,6 +109,7 @@ class UserRoadmapDTO(UserRoadmapAddDTO):
 
 class BackgroundDTO(BaseModel):
     background: str
+
 
 class AvatarDTO(BaseModel):
     avatar: str

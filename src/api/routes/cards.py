@@ -50,7 +50,7 @@ async def add_card(
 async def get_card_info(
     user_dep: UserDep, card_id: Annotated[int, Path(title="Card id")], uow: UOWDep
 ):
-    card = await CardsService.get_card_extended(uow, card_id, user_dep['id'])
+    card = await CardsService.get_card_extended(uow, card_id, user_dep["id"])
 
     if card is None:
         raise HTTPException(status_code=404, detail="Card not found")

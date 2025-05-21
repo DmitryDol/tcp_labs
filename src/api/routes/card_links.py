@@ -11,7 +11,7 @@ from services.roadmaps import RoadmapsService
 router = APIRouter(prefix="/card_links", tags=["card_links"])
 
 
-#TODO check is user linked to this roadmap
+# TODO check is user linked to this roadmap
 @router.delete("/{card_link_id}", status_code=204)
 async def delete_card_link(
     user_dep: UserDep,
@@ -35,7 +35,8 @@ async def delete_card_link(
 
     card_link_id = await CardLinksService.delete_card_link(uow, card_link_id)
 
-#TODO check is user linked to this roadmap
+
+# TODO check is user linked to this roadmap
 @router.patch("/{card_link_id}")
 async def edit_card_link(
     user_dep: UserDep,
