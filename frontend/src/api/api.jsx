@@ -335,7 +335,7 @@ export const userRoadmapAPI = {
   changeRoadmapBackground: async (roadmapId, file) => {
     try {
       currentBackground = userRoadmapAPI.getBackgroundFilename(roadmapId);
-      await minioAPI.deleteImage(currentBackground, "avatars");
+      await minioAPI.deleteImage(currentBackground, "backgrounds");
       const background = await minioAPI.uploadImage(file, "backgrounds").filename;
       const response = await apiClient.put(
         `/api/core/user_roadmaps/${roadmapId}/background`,
