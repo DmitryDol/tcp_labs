@@ -311,7 +311,7 @@ export const userRoadmapAPI = {
       handleError(error, "linking user to roadmap");
     }
   },
-  unlinkUserFromRoadmap: async (roadmapId, userId) => {
+  unlinkUserFromRoadmap: async (roadmapId) => {
     try {
       await apiClient.delete(
         `/api/core/user_roadmaps/${roadmapId}`
