@@ -52,7 +52,7 @@ class UserCardService:
             card_ids = []
             for card in cards:
                 user_card = {"user_id": user_id, "card_id": card.id}
-                card_id = await UserCardService.add_user_card(
+                await UserCardService.add_user_card(
                     uow, UserCardAddDTO.model_validate(user_card)
                 )
                 card_ids.append(card.id)
