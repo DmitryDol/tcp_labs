@@ -75,7 +75,7 @@ class UsersService:
         async with uow:
             user = await uow.users.edit_one(user_id, avatar)
             return user
-        
+
     @staticmethod
     async def get_avatar(uow: IUnitOfWork, user_id: int):
         async with uow:

@@ -110,6 +110,7 @@ class UserRoadmapDTO(UserRoadmapAddDTO):
 class BackgroundDTO(BaseModel):
     background: str
 
+
 class AvatarDTO(BaseModel):
     avatar: str
 

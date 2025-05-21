@@ -65,6 +65,6 @@ async def change_user_avatar(user_dep: UserDep, avatar: AvatarDTO, uow: UOWDep):
     await UsersService.edit_avatar(uow, avatar, user_dep["id"])
 
 
-@router.get('/avatar')
+@router.get("/avatar")
 async def get_user_avatar(user_dep: UserDep, uow: UOWDep):
-    return await UsersService.get_avatar(uow, user_dep['id'])
+    return await UsersService.get_avatar(uow, user_dep["id"])
