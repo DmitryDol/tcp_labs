@@ -24,12 +24,8 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )
-    login: Mapped[str] = mapped_column(
-        String(256), unique=True, nullable=False
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    login: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String, nullable=False)
     name: Mapped[str] = mapped_column(String(256), nullable=False)
     created_at: Mapped[DateTime] = mapped_column(
@@ -73,9 +69,7 @@ class Roadmap(Base):
         view_only = "view only"
         can_edit = "can edit"
 
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     owner_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
@@ -117,9 +111,7 @@ class Roadmap(Base):
 class Card(Base):
     __tablename__ = "cards"
 
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     roadmap_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("roadmaps.id", ondelete="CASCADE"), nullable=False
     )
@@ -146,9 +138,7 @@ class Card(Base):
 
     __table_args__ = (
         # order_pos will be unique in the roadmap
-        UniqueConstraint(
-            "roadmap_id", "order_position", name="uq_roadmap_card_position"
-        ),
+        UniqueConstraint("roadmap_id", "order_position", name="uq_roadmap_card_position"),
     )
 
     def to_read_model(self) -> CardDTO:
@@ -172,9 +162,7 @@ class UserRoadmap(Base):
         server_default=text(f"'{settings.DEFAULT_BACKGROUND}'"),
     )
 
-    user: Mapped["User"] = relationship(
-        back_populates="roadmaps", passive_deletes=True
-    )
+    user: Mapped["User"] = relationship(back_populates="roadmaps", passive_deletes=True)
     roadmap: Mapped["Roadmap"] = relationship(
         back_populates="users", passive_deletes=True
     )
@@ -201,12 +189,8 @@ class UserCard(Base):
         Enum(StatusEnum), nullable=False, server_default=text("'to_do'")
     )
 
-    user: Mapped["User"] = relationship(
-        back_populates="cards", passive_deletes=True
-    )
-    card: Mapped["Card"] = relationship(
-        back_populates="users", passive_deletes=True
-    )
+    user: Mapped["User"] = relationship(back_populates="cards", passive_deletes=True)
+    card: Mapped["Card"] = relationship(back_populates="users", passive_deletes=True)
 
     def to_read_model(self) -> UserCardDTO:
         return UserCardDTO.model_validate(self, from_attributes=True)
@@ -215,18 +199,14 @@ class UserCard(Base):
 class CardLink(Base):
     __tablename__ = "card_links"
 
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     card_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("cards.id", ondelete="CASCADE"), nullable=False
     )
     link_title: Mapped[str | None] = mapped_column(String(256))
     link_content: Mapped[str | None] = mapped_column(String)
 
-    card: Mapped["Card"] = relationship(
-        back_populates="links", passive_deletes=True
-    )
+    card: Mapped["Card"] = relationship(back_populates="links", passive_deletes=True)
 
     def to_read_model(self) -> CardLinkDTO:
         return CardLinkDTO.model_validate(self, from_attributes=True)

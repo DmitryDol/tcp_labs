@@ -43,7 +43,9 @@ async def add_roadmap(user_dep: UserDep, roadmap: RoadmapAddDTO, uow: UOWDep):
 async def get_roadmap_info(
     user_dep: UserDep, roadmap_id: Annotated[int, Path(title="Roadmap id")], uow: UOWDep
 ):
-    extended_roadmap = await RoadmapsService.get_roadmap_extended(uow, roadmap_id)
+    extended_roadmap = await RoadmapsService.get_roadmap_extended(
+        uow, roadmap_id, user_dep["id"]
+    )
 
     if extended_roadmap is None:
         raise HTTPException(status_code=404, detail="Roadmap not found")
@@ -57,6 +59,9 @@ async def get_roadmap_info(
     return extended_roadmap
 
 
+# TODO if owner of roadmap change roadmap visibilyty to private raise exeption
+# TODO if owner of roadmap change roadmap edit_permission to on
+# TODO если владелец роадмапа меняет параметры доступа на недоступные для остальных пользователей, то нужно удалить привязки пользователей к роадмапу
 @router.patch("/{roadmap_id}")
 async def edit_roadmap(
     user_dep: UserDep,

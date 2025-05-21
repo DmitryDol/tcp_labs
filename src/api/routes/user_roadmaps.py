@@ -4,7 +4,9 @@ from fastapi import APIRouter, HTTPException, Path
 
 from api.dependencies.dependencies import UOWDep, UserDep
 from api.dependencies.pagination_dependency import PaginationDep
+from config import settings
 from dto import (
+    BackgroundDTO,
     PaginatedRoadmapsDTO,
     UserRoadmapAddExtendedDTO,
     UserRoadmapEditDTO,
@@ -20,9 +22,9 @@ router = APIRouter(prefix="/user_roadmaps", tags=["user_roadmaps"])
 async def get_linked_roadmaps(
     user_dep: UserDep,
     pagination: PaginationDep,
-    search: str,
-    difficulty: str,
     uow: UOWDep,
+    search: str | None = None,
+    difficulty: str | None = None,
 ):
     roadmaps = await UserRoadmapsService.get_linked_roadmaps(
         uow=uow,
@@ -47,7 +49,7 @@ async def link_user_to_roadmap(
     user_roadmap_info = await UserRoadmapsService.get_background(
         uow, {"user_id": user_dep["id"], "roadmap_id": roadmap_id}
     )
-    if user_roadmap_info is None:
+    if user_roadmap_info is not None:
         raise HTTPException(status_code=409, detail="User roadmap relation already exist")
 
     user_roadmap_id = await UserRoadmapsService.link_user_to_roadmap(
@@ -61,8 +63,26 @@ async def link_user_to_roadmap(
         "roadmap_id": user_roadmap_id.roadmap_id,
         "card_ids": card_ids,
     }
+    print(user_roadmap_id_with_card_ids)
     return UserRoadmapAddExtendedDTO.model_validate(
         user_roadmap_id_with_card_ids, from_attributes=True
+    )
+
+
+@router.get("/in_progress", response_model=PaginatedRoadmapsDTO)
+async def get_roadmaps_with_status_in_progress(
+    user_dep: UserDep,
+    pagination: PaginationDep,
+    uow: UOWDep,
+    search: str | None = None,
+    difficulty: str | None = None,
+):
+    return await UserRoadmapsService.get_roadmaps_with_in_progress_cards(
+        uow=uow,
+        pagination=pagination,
+        user_id=user_dep["id"],
+        search=search,
+        difficulty=difficulty,
     )
 
 
@@ -83,9 +103,10 @@ async def delete_user_roadmap_link(
         await UserRoadmapsService.delete_user_roadmap(
             uow, {"roadmap_id": roadmap_id, "user_id": user_dep["id"]}
         )
+        # await UserCardService.delete_user_card
 
 
-@router.get("/{roadmap_id}/background")
+@router.get("/{roadmap_id}/background", response_model=BackgroundDTO)
 async def get_roadmap_background(
     user_dep: UserDep, roadmap_id: Annotated[int, Path(title="Roadmap id")], uow: UOWDep
 ):
@@ -93,10 +114,10 @@ async def get_roadmap_background(
         uow, {"user_id": user_dep["id"], "roadmap_id": roadmap_id}
     )
 
-    if background is None:
-        raise HTTPException(status_code=404, detail="User roadmap relation not found")
+    # if background is None:
+    #     raise HTTPException(status_code=404, detail="User roadmap relation not found")
 
-    return background
+    return background or BackgroundDTO(background=settings.DEFAULT_BACKGROUND)
 
 
 @router.put("/{roadmap_id}/background")

@@ -1,5 +1,4 @@
-
-from dto import CardAddDTO, CardDTO, CardEditDTO, CardExtendedDTO
+from dto import CardAddDTO, CardDTO, CardEditDTO, CardExtendedDTO, UserCardDTO
 from utils.unitofwork import IUnitOfWork
 
 
@@ -28,7 +27,7 @@ class CardsService:
     @staticmethod
     async def get_card(uow: IUnitOfWork, card_id) -> CardDTO | None:
         async with uow:
-            card = await uow.cards.find_one(card_id)
+            card = await uow.cards.find_one(id=card_id)
             return card
 
     @staticmethod
@@ -40,7 +39,7 @@ class CardsService:
 
     @staticmethod
     async def get_card_extended(
-        uow: IUnitOfWork, card_id: int
+        uow: IUnitOfWork, card_id: int, user_id: int
     ) -> CardExtendedDTO | None:
         async with uow:
             card = await uow.cards.find_one(id=card_id)
@@ -50,10 +49,16 @@ class CardsService:
 
             card_dict = card.model_dump()
             card_links = await uow.card_links.find_all({"card_id": card.id})
-            if card_links:
-                card_dict["links"] = [card_link.model_dump() for card_link in card_links]
-            else:
-                card_dict["links"] = []
+
+            card_dict["links"] = [
+                card_link.model_dump() for card_link in (card_links or [])
+            ]
+
+            card_status: UserCardDTO = await uow.user_cards.find_one(
+                user_id=user_id, card_id=card_id
+            )
+            card_dict["status"] = card_status and card_status.status
+
             extended_card = CardExtendedDTO.model_validate(
                 card_dict, from_attributes=True
             )

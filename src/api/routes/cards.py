@@ -3,9 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Path
 
 from api.dependencies.dependencies import UOWDep, UserDep
-from dto import CardAddDTO, CardEditDTO, CardExtendedDTO, RoadmapDTO
+from dto import CardAddDTO, CardEditDTO, CardExtendedDTO, RoadmapDTO, UserCardAddDTO
 from services.cards import CardsService
 from services.roadmaps import RoadmapsService
+from services.user_cards import UserCardService
+from services.user_roadmaps import UserRoadmapsService
 
 router = APIRouter(prefix="/cards", tags=["cards"])
 
@@ -25,13 +27,22 @@ async def add_card(
 
     if (
         roadmap_info.owner_id != user_dep["id"]
-        and roadmap_info.edit_permission != "can edit"
+        and roadmap_info.edit_permission != "can edit"  # check is user linked to roadmap
     ):
         raise HTTPException(
             status_code=403, detail="User does not have permission to edit this card."
         )
 
+    user_roadmap_info = await UserRoadmapsService.get_background(
+        uow, {"user_id": user_dep["id"], "roadmap_id": card.roadmap_id}
+    )
+    if user_roadmap_info is None:
+        raise HTTPException(status_code=403, detail="User not linked to this roadmap.")
+
     card_id = await CardsService.add_card(uow, card)
+    await UserCardService.add_user_card(
+        uow, UserCardAddDTO(user_id=user_dep["id"], card_id=card_id)
+    )
     return {"card_id": card_id}
 
 

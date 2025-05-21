@@ -42,11 +42,11 @@ class RoadmapsService:
     @staticmethod
     async def get_roadmaps(uow: IUnitOfWork, roadmap_ids: list[int]):
         async with uow:
-            roadmaps = await uow.roadmaps.find_all(id=roadmap_ids)
+            roadmaps = await uow.roadmaps.find_all({"id": roadmap_ids})
             return roadmaps
 
     @staticmethod
-    async def get_roadmap_extended(uow: IUnitOfWork, roadmap_id: int):
+    async def get_roadmap_extended(uow: IUnitOfWork, roadmap_id: int, user_id: int):
         async with uow:
             roadmap = await uow.roadmaps.find_one(id=roadmap_id)
 
@@ -58,7 +58,7 @@ class RoadmapsService:
             roadmap_dict["cards"] = []
             for card in cards:
                 roadmap_dict["cards"].append(
-                    await CardsService.get_card_extended(uow, card.id)
+                    await CardsService.get_card_extended(uow, card.id, user_id)
                 )
             logger.debug("\n\n\n", roadmap_dict, "\n\n\n")
             extended_roadmap = RoadmapExtendedDTO.model_validate(

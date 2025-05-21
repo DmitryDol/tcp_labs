@@ -1,4 +1,3 @@
-
 from sqlalchemy import select
 
 from dto import UserAuthDTO

@@ -99,7 +99,7 @@ class UserRoadmapAddDTO(BaseModel):
 
 
 class UserRoadmapAddExtendedDTO(UserRoadmapAddDTO):
-    card_ids: list[int]
+    card_ids: list[int] | None
 
 
 class UserRoadmapDTO(UserRoadmapAddDTO):
@@ -144,6 +144,7 @@ class CardLinkEditDTO(BaseModel):
 
 class CardExtendedDTO(CardDTO):
     links: list[CardLinkDTO | None]
+    status: str | None
 
 
 class RoadmapExtendedDTO(RoadmapDTO):

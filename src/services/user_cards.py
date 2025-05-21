@@ -1,4 +1,3 @@
-
 from dto import CardDTO, RoadmapDTO, UserCardAddDTO, UserCardEditDTO
 from services.roadmaps import RoadmapsService
 from utils.unitofwork import IUnitOfWork
@@ -15,7 +14,7 @@ class UserCardService:
 
     @staticmethod
     async def edit_user_card(
-        uow: IUnitOfWork, user_card_id: int, user_card: UserCardEditDTO
+        uow: IUnitOfWork, user_card_id: dict[str, int], user_card: UserCardEditDTO
     ):
         user_card_dict = user_card.model_dump(exclude_unset=True)
         async with uow:
@@ -45,7 +44,7 @@ class UserCardService:
             return None
 
         async with uow:
-            cards: list[CardDTO] = await uow.cards.find_all(roadmap_id=roadmap.id)
+            cards: list[CardDTO] = await uow.cards.find_all({"roadmap_id": roadmap.id})
 
             if not cards:
                 return None
@@ -56,5 +55,5 @@ class UserCardService:
                 card_id = await UserCardService.add_user_card(
                     uow, UserCardAddDTO.model_validate(user_card)
                 )
-                card_ids.append(card_id)
+                card_ids.append(card.id)
             return card_ids
