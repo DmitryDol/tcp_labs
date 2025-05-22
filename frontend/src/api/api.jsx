@@ -434,13 +434,29 @@ export const cardLinkAPI = {
         link_title: linkTitle,
         link_content: linkContent,
       };
-      const response = apiClient.post("/api/core/card_links", cardLinkData);
+      const response = await apiClient.post("/api/core/card_links", cardLinkData);
       return response.data;
     } catch (error) {
       handleError(error, "adding card link");
     }
   },
 };
+
+// --- User Card ---
+export const userCardAPI = {
+  editCardStatus: async (cardId, cardStatus) => {
+    try {
+      const editUserCardData = {
+        status: cardStatus,
+        card_id: cardId
+      }
+      const response = await apiClient.put('api/core/user_cards/status', editUserCardData)
+      return response.data
+    } catch (error) {
+      handleError(error, "changing user card status")
+    }
+  }
+}
 
 // --- Image Service (Java Backend - /api/images) ---
 
