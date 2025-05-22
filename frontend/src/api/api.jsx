@@ -447,10 +447,9 @@ export const userCardAPI = {
   editCardStatus: async (cardId, cardStatus) => {
     try {
       const editUserCardData = {
-        status: cardStatus,
-        card_id: cardId
+        status: cardStatus
       }
-      const response = await apiClient.put('api/core/user_cards/status', editUserCardData)
+      const response = await apiClient.put(`api/core/user_cards/status?card_id=${cardId}`, editUserCardData)
       return response.data
     } catch (error) {
       handleError(error, "changing user card status")
