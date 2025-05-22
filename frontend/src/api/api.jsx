@@ -41,15 +41,11 @@ apiClient.interceptors.response.use(
   }
 );
 
-// Обработчик ошибок для вывода в консоль и проброса дальше
 const handleError = (error, context) => {
-  // Axios автоматически обрабатывает не-2xx коды как ошибки
   console.error(`Error ${context}:`, error.response?.data || error.message);
-  // Пробрасываем ошибку, чтобы компонент мог ее обработать (например, показать сообщение пользователю)
   throw error;
 };
 
-const cache = new Map();
 
 // --- Core Service (Python Backend - /api/core) ---
 
