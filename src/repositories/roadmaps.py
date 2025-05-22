@@ -41,6 +41,8 @@ class RoadmapRepository(SQLAlchemyRepository):
             except ValueError:
                 pass
 
+        stmt = stmt.order_by(self.model.id.desc())
+
         count_stmt = select(func.count()).select_from(stmt.subquery())
         total_count = await self.session.scalar(count_stmt)
 
