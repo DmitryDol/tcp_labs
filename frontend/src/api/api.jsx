@@ -172,6 +172,11 @@ export const userAPI = {
         avatar: newAvatar.filename,
       });
       localStorage.setItem("avatar", newAvatar.filename);
+
+      if (!response.data?.avatar) {
+        response.data.avatar = newAvatar.filename;
+      }
+
       return response.data;
     } catch (error) {
       handleError(error, "changing user avatar");

@@ -117,7 +117,7 @@ async def get_roadmap_background(
     # if background is None:
     #     raise HTTPException(status_code=404, detail="User roadmap relation not found")
 
-    return background or BackgroundDTO(background=settings.DEFAULT_BACKGROUND)
+    return background
 
 
 @router.put("/{roadmap_id}/background")

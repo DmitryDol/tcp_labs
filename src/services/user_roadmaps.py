@@ -1,6 +1,7 @@
 import math
 
 from api.dependencies.pagination_dependency import PaginationParams
+from config import settings
 from dto import (
     BackgroundDTO,
     PaginatedRoadmapsDTO,
@@ -55,13 +56,13 @@ class UserRoadmapsService:
     @staticmethod
     async def get_background(
         uow: IUnitOfWork, user_roadmap_id: dict[str, int]
-    ) -> BackgroundDTO | None:
+    ) -> BackgroundDTO:
         async with uow:
             user_roadmap = await uow.user_roadmaps.find_one(
                 user_id=user_roadmap_id["user_id"],
                 roadmap_id=user_roadmap_id["roadmap_id"],
             )
-            return BackgroundDTO.model_validate(user_roadmap, from_attributes=True)
+            return BackgroundDTO.model_validate(user_roadmap or {"background": settings.DEFAULT_BACKGROUND}, from_attributes=True)
 
     @staticmethod
     async def get_linked_roadmaps(
