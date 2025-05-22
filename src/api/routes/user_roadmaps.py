@@ -143,5 +143,5 @@ async def edit_roadmap_background(
         uow,
         roadmap_id,
         user_dep["id"],
-        UserRoadmapEditDTO.model_validate(background=background, from_attributes=True),
+        UserRoadmapEditDTO.model_validate(background, from_attributes=True),
     )
