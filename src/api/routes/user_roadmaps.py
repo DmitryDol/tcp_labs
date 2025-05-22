@@ -63,7 +63,6 @@ async def link_user_to_roadmap(
         "roadmap_id": user_roadmap_id.roadmap_id,
         "card_ids": card_ids,
     }
-    print(user_roadmap_id_with_card_ids)
     return UserRoadmapAddExtendedDTO.model_validate(
         user_roadmap_id_with_card_ids, from_attributes=True
     )
@@ -110,13 +109,15 @@ async def delete_user_roadmap_link(
 async def get_roadmap_background(
     user_dep: UserDep, roadmap_id: Annotated[int, Path(title="Roadmap id")], uow: UOWDep
 ):
+    roadmap_info = await RoadmapsService.get_roadmap(uow, roadmap_id)
+    if roadmap_info is None:
+        raise HTTPException(status_code=404, detail="Roadmap not found")
     background = await UserRoadmapsService.get_background(
         uow, {"user_id": user_dep["id"], "roadmap_id": roadmap_id}
     )
 
-    # if background is None:
-    #     raise HTTPException(status_code=404, detail="User roadmap relation not found")
-
+    if background is None:
+        return BackgroundDTO(background=settings.DEFAULT_BACKGROUND)
     return background
 
 

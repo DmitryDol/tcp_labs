@@ -1,7 +1,6 @@
 import math
 
 from api.dependencies.pagination_dependency import PaginationParams
-from config import settings
 from dto import (
     BackgroundDTO,
     PaginatedRoadmapsDTO,
@@ -62,7 +61,9 @@ class UserRoadmapsService:
                 user_id=user_roadmap_id["user_id"],
                 roadmap_id=user_roadmap_id["roadmap_id"],
             )
-            return BackgroundDTO.model_validate(user_roadmap or {"background": settings.DEFAULT_BACKGROUND}, from_attributes=True)
+            if user_roadmap is None:
+                return None
+            return BackgroundDTO.model_validate(user_roadmap, from_attributes=True)
 
     @staticmethod
     async def get_linked_roadmaps(
