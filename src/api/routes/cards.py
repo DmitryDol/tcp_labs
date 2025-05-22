@@ -101,7 +101,7 @@ async def edit_card(
     if card_info is None:
         raise HTTPException(status_code=404, detail="Card not found")
 
-    roadmap_info = await RoadmapsService.get_roadmap(uow, card.roadmap_id)
+    roadmap_info = await RoadmapsService.get_roadmap(uow, card_info.roadmap_id)
 
     if (
         roadmap_info.owner_id != user_dep["id"]
