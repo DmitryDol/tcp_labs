@@ -44,6 +44,7 @@ class UserEditDTO(BaseModel):
 
 
 class SimplifiedRoadmapDTO(BaseModel):
+    owner_id: int
     id: int
     title: str
     description: str
