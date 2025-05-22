@@ -37,5 +37,5 @@ async def change_card_status(
         )
 
     await UserCardService.edit_user_card(
-        uow, {"user_id": user_dep["id"], "card_id": user_card.card_id}, UserCardEditDTO(user_card.status)
+        uow, {"user_id": user_dep["id"], "card_id": user_card.card_id}, UserCardEditDTO(status=user_card.status)
     )
