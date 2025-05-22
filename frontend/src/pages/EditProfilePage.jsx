@@ -18,6 +18,9 @@ const EditProfilePage = () => {
     password2: "",
   });
   const [avatar, setAvatar] = useState(null);
+  const [username, setUsername] = useState(
+    JSON.parse(localStorage.getItem("userData"))?.username || "Имя пользователя"
+  );
 
   useEffect(() => {
     const getAvatar = async () => {
@@ -29,7 +32,7 @@ const EditProfilePage = () => {
       setAvatar(imageUrl);
     };
     getAvatar();
-  });
+  }, []);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -42,16 +45,20 @@ const EditProfilePage = () => {
     e.preventDefault();
     const { name, password, password2 } = formData;
 
-    if (password.length < 6 || password.length > 16) {
+    if (password.length == 0 && password2.length == 0) {
+      await userAPI.editUserInfo(name, undefined);
+    } else if (password.length < 6 || password.length > 16) {
       setError("Пароль должен содержать от 6 до 16 символов");
       return;
-    }
-    if (password != password2) {
+    } else if (password != password2) {
       setError("Пароли не совпадают");
       return;
+    } else if (name.length > 0) {
+      await userAPI.editUserInfo(name, password);
+    } else {
+      await userAPI.editUserInfo(password);
     }
-    // Здесь логика сохранения изменений
-    await userAPI.editUserInfo(name, password);
+    setUsername(JSON.parse(localStorage.getItem("userData"))?.username);
     // alert("Изменения сохранены!");
   };
 
@@ -63,12 +70,12 @@ const EditProfilePage = () => {
 
   const handleDeleteAvatar = async () => {
     try {
-      const updatedUserInfo = await userAPI.deleteUserAvatar();
-      filename = import.meta.env.VITE_DEFAULT_AVATAR;
-      if (localStorage.getItem("avatar") !== undefined) {
-        filename = localStorage.getItem("avatar");
+      const updatedAvatar = await userAPI.deleteUserAvatar();
+      let filename = updatedAvatar.avatar;
+      if (updatedAvatar && updatedAvatar.avatar) {
+        const imageUrl = minioAPI.getImageUrl(updatedAvatar.avatar, "avatars");
+        setAvatar(imageUrl);
       }
-      setAvatar(minioAPI.getImageUrl(filename, "avatars"));
     } catch (err) {
       console.error("delete avatar");
     }
@@ -79,14 +86,14 @@ const EditProfilePage = () => {
     if (file) {
       try {
         const updatedUserInfo = await userAPI.changeUserAvatar(file);
-        filename = import.meta.env.VITE_DEFAULT_AVATAR;
-        if (localStorage.getItem("avatar") !== undefined) {
+        let filename;
+        if (updatedUserInfo && updatedUserInfo?.avatar) {
+          filename = updatedUserInfo.avatar;
+        } else {
           filename = localStorage.getItem("avatar");
         }
-        if (updatedUserInfo !== undefined) {
-          filename = updatedUserInfo.avatar;
-        }
-        setAvatar(minioAPI.getImageUrl(filename, "avatars"));
+        const imageUrl = minioAPI.getImageUrl(filename, "avatars");
+        setAvatar(imageUrl);
       } catch (err) {
         console.error("selected_avatar");
       }
@@ -103,10 +110,7 @@ const EditProfilePage = () => {
             <img src={avatar} alt="avatar" className="avatar" />
           </span>
           <div className="user-info">
-            <div>
-              {JSON.parse(localStorage.getItem("userData"))?.username ||
-                "Имя пользователя"}
-            </div>
+            <div>{username}</div>
             <div>
               {JSON.parse(localStorage.getItem("userData"))?.login || "Логин"}
             </div>

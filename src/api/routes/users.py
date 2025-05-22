@@ -44,7 +44,7 @@ async def delete_user(
 
 @router.patch("")
 async def edit_user(user_dep: UserDep, user: UserEditDTO, uow: UOWDep):
-    if hasattr(user, "password_hash"):
+    if user.password_hash is not None:
         user.password_hash = hash_password(user.password_hash)
     await UsersService.edit_user(uow, user_dep["id"], user)
     user_data = await UsersService.get_user(uow, id=user_dep["id"])
@@ -63,6 +63,7 @@ async def delete_user_avatar(user_dep: UserDep, uow: UOWDep):
 @router.put("/avatar")
 async def change_user_avatar(user_dep: UserDep, avatar: AvatarDTO, uow: UOWDep):
     await UsersService.edit_avatar(uow, avatar, user_dep["id"])
+    return avatar
 
 
 @router.get("/avatar")

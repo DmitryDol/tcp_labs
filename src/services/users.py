@@ -73,7 +73,7 @@ class UsersService:
     @staticmethod
     async def edit_avatar(uow: IUnitOfWork, avatar: AvatarDTO, user_id: int):
         async with uow:
-            user = await uow.users.edit_one(user_id, avatar)
+            user = await uow.users.edit_one(user_id, avatar.model_dump())
             return user
 
     @staticmethod
