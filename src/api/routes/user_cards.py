@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from api.dependencies.dependencies import UOWDep, UserDep
-from dto import UserCardEditDTO
+from dto import UserCardEditDTO, UserCardEditWithUserIdDTO
 from services.cards import CardsService
 from services.roadmaps import RoadmapsService
 from services.user_cards import UserCardService
@@ -12,9 +12,9 @@ router = APIRouter(prefix="/user_cards", tags=["user_cards"])
 
 @router.put("/status")
 async def change_card_status(
-    uow: UOWDep, user_dep: UserDep, user_card: UserCardEditDTO, card_id: int
+    uow: UOWDep, user_dep: UserDep, user_card: UserCardEditWithUserIdDTO
 ):
-    card_info = await CardsService.get_card(uow, card_id)
+    card_info = await CardsService.get_card(uow, user_card.card_id)
 
     if card_info is None:
         raise HTTPException(status_code=404, detail="Card not found")
@@ -37,5 +37,5 @@ async def change_card_status(
         )
 
     await UserCardService.edit_user_card(
-        uow, {"user_id": user_dep["id"], "card_id": card_id}, user_card
+        uow, {"user_id": user_dep["id"], "card_id": user_card.card_id}, UserCardEditDTO(user_card.status)
     )
