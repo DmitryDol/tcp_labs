@@ -35,6 +35,17 @@ class UserCardService:
             return user_card
 
     @staticmethod
+    async def delete_user_cards(uow: IUnitOfWork, user_id: int, roadmap_id: int):
+        async with uow:
+            card_ids: list[CardDTO] = await uow.cards.find_all({"roadmap_id": roadmap_id})
+            for card_id in card_ids:
+                await uow.user_cards.delete_one(
+                    {"user_id": user_id, "card_id": card_id.id}
+                )
+            await uow.commit()
+            return card_ids
+
+    @staticmethod
     async def link_user_to_cards_in_roadmap(
         uow: IUnitOfWork, user_id: int, roadmap_id: int
     ):
