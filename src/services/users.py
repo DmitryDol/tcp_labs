@@ -68,12 +68,14 @@ class UsersService:
             if user.avatar == settings.DEFAULT_AVATAR:
                 return False
             await uow.users.edit_one(user_id, {"avatar": settings.DEFAULT_AVATAR})
+            await uow.commit()
             return True
 
     @staticmethod
     async def edit_avatar(uow: IUnitOfWork, avatar: AvatarDTO, user_id: int):
         async with uow:
             user = await uow.users.edit_one(user_id, avatar.model_dump())
+            await uow.commit()
             return user
 
     @staticmethod
