@@ -1,45 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
+import { minioAPI, roadmapAPI, userRoadmapAPI } from "../api/api";
 
 function RoadmapModal(props) {
   const { isEditing, initialData, onHide, onSave } = props;
-  
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
-  const [difficulty, setDifficulty] = useState('');
-  const [visibility, setVisibility] = useState('');
-  const [editPermission, setEditPermission] = useState('');
-  
+  const [difficulty, setDifficulty] = useState("");
+  const [visibility, setVisibility] = useState("");
+  const [editPermission, setEditPermission] = useState("");
+
   // Загрузка начальных значений при редактировании
   useEffect(() => {
     if (isEditing && initialData) {
-      setTitle(initialData.title || '');
-      setDescription(initialData.description || '');
-      setDifficulty(initialData.difficulty || '');
-      setVisibility(initialData.visibility || '');
-      setEditPermission(initialData.editPermission || '');
+      setTitle(initialData.title || "");
+      setDescription(initialData.description || "");
+      setDifficulty(initialData.difficulty || "");
+      setVisibility(initialData.visibility || "");
+      setEditPermission(initialData.editPermission || "");
     }
   }, [isEditing, initialData]);
-  
-  // Обработчик сохранения
-  const handleSave = () => {
-    const roadmapData = {
+
+  const handleClose = () => {
+    setTitle('');
+    setDescription('');
+    setDifficulty('');
+    setVisibility('');
+    setEditPermission('');
+    onHide();
+  };
+
+  const handleSave = async () => {
+    if (!isEditing) {
+      const response = await roadmapAPI.addRoadmap(
+        JSON.parse(localStorage.getItem("userData")).id,
+        title,
+        description,
+        difficulty,
+        editPermission,
+        visibility
+      );
+      console.log(response.roadmap_id)
+      if(image){
+        await userRoadmapAPI.changeRoadmapBackground(response.roadmap_id, image)
+      }
+      const newRoadmap = {
+      id: response.roadmap_id,
       title,
       description,
-      image,
       difficulty,
       visibility,
-      editPermission
+      editPermission,
     };
-    
-    if (onSave) {
-      onSave(roadmapData);
+      onSave(newRoadmap);
     }
-    
-    if (onHide) {
-      onHide();
-    }
+    handleClose();
   };
 
   return (
@@ -75,29 +92,32 @@ function RoadmapModal(props) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <Form.Group className="mb-3" controlId="formRoadmapImage">
-              <Form.Label>Фоновое изображение</Form.Label>
-              <Form.Control
-                type="file"
-                accept="image/*"
-                aria-label="Выберите изображение для фона роадмапа"
-                onChange={(e) => setImage(e.target.files[0])}
-              />
-              {isEditing && initialData && initialData.imageName && (
-                <Form.Text className="text-muted">
-                  Текущее изображение: {initialData.imageName}
-                </Form.Text>
-              )}
-            </Form.Group>
           </Form.Group>
-          <div style={{
-            display: "flex",
-            alignItems: "flex-end",
-            gap: "10px",
-          }}>
+          <Form.Group className="mb-3" controlId="formRoadmapImage">
+            <Form.Label>Фоновое изображение</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              aria-label="Выберите изображение для фона роадмапа"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
+            {isEditing && initialData && initialData.imageName && (
+              <Form.Text className="text-muted">
+                Текущее изображение: {initialData.imageName}
+              </Form.Text>
+            )}
+          </Form.Group>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: "10px",
+            }}
+          >
             <Form.Group className="mb-3" controlId="formDifficulty">
               <Form.Label>Сложность</Form.Label>
-              <Form.Select 
+              <Form.Select
                 aria-label="Выбор сложности"
                 value={difficulty}
                 onChange={(e) => setDifficulty(e.target.value)}
@@ -111,7 +131,7 @@ function RoadmapModal(props) {
 
             <Form.Group className="mb-3" controlId="formVisibility">
               <Form.Label>Видимость</Form.Label>
-              <Form.Select 
+              <Form.Select
                 aria-label="Выбор видимости"
                 value={visibility}
                 onChange={(e) => setVisibility(e.target.value)}
@@ -125,7 +145,7 @@ function RoadmapModal(props) {
 
             <Form.Group className="mb-3" controlId="formEditPermission">
               <Form.Label>Права редактирования</Form.Label>
-              <Form.Select 
+              <Form.Select
                 aria-label="Выбор прав редактирования"
                 value={editPermission}
                 onChange={(e) => setEditPermission(e.target.value)}
@@ -139,12 +159,12 @@ function RoadmapModal(props) {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button 
-          onClick={handleSave} 
+        <Button
+          onClick={handleSave}
           style={{
-            "--bs-btn-bg": "blueviolet", 
+            "--bs-btn-bg": "blueviolet",
             "--bs-btn-hover-bg": "blueviolet",
-            "--bs-btn-active-bg": "#a45be8"
+            "--bs-btn-active-bg": "#a45be8",
           }}
         >
           Сохранить

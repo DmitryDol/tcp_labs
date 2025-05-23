@@ -33,8 +33,7 @@ apiClient.interceptors.response.use(
         // Если не удалось обновить токен, перенаправляем на логин
         localStorage.removeItem("accessToken");
         localStorage.removeItem("userData");
-        const navigate = useNavigate();
-        navigate("/");
+        window.location = "/";
       }
     }
     return Promise.reject(error);
@@ -70,7 +69,7 @@ export const authAPI = {
 
       localStorage.setItem("accessToken", response.access_token);
       const userData = {
-        id: response.data.user_id,
+        id: response.data.id,
         login: response.data.login,
         username: response.data.username,
       };
@@ -97,9 +96,10 @@ export const authAPI = {
   getCurrentUser: async () => {
     try {
       const response = await apiClient.get("/api/core/auth/me");
-      userData = {
+      const userData = {
         login: response.data.login,
         username: response.data.username,
+        id: response.data.id
       };
       localStorage.setItem("userData", JSON.stringify(userData));
     } catch (error) {
@@ -331,15 +331,16 @@ export const userRoadmapAPI = {
   },
   changeRoadmapBackground: async (roadmapId, file) => {
     try {
-      currentBackground = userRoadmapAPI.getBackgroundFilename(roadmapId);
-      if (currentBackground != import.meta.env.VITE_DEFAULT_BACKGROUND) {
+      const currentBackground = await userRoadmapAPI.getBackgroundFilename(roadmapId);
+      if (currentBackground !== import.meta.env.VITE_DEFAULT_BACKGROUND) {
         await minioAPI.deleteImage(currentBackground, "backgrounds");
       }
-      const background = await minioAPI.uploadImage(file, "backgrounds")
-        .filename;
+      const background = await minioAPI.uploadImage(file, "backgrounds");
+      console.log(background);
+      console.log(roadmapId);
       const response = await apiClient.put(
         `/api/core/user_roadmaps/${roadmapId}/background`,
-        {"background": background }
+        {"background": background.filename }
       );
       return response.data;
     } catch (error) {

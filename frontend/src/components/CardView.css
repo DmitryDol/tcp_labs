@@ -7,9 +7,6 @@
 }
 .cardhead{
     background-color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
 }
 .cardaccordion{
     --bs-accordion-border-radius:0px
@@ -22,6 +19,7 @@
 }
 .settingsgroup{
     display: flex;
-    flex-direction: column;
+    flex-direction:row;
     align-items: flex-end;
+    margin-top: 1rem;
 }
