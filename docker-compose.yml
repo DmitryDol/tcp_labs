@@ -1,4 +1,17 @@
 services:
+  frontend:
+    build: 
+      context: ./frontend
+      args:
+        VITE_DEFAULT_AVATAR: ${DEFAULT_AVATAR}
+        VITE_DEFAULT_BACKGROUND: ${DEFAULT_BACKGROUND}
+    container_name: frontend
+    ports:
+      - "5050:5050"
+    networks:
+      - storage-net
+    restart: always
+
   minio:
     image: quay.io/minio/minio:latest
     container_name: minio
