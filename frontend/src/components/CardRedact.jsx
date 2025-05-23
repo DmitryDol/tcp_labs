@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { FaRegTrashAlt } from 'react-icons/fa';
+import { cardAPI, cardLinkAPI } from '../api/api';
 
 function CardModal(props) {
+  const { roadmapId, isEditing, initialData, onSave, numberOfCards, onHide} = props;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [links, setLinks] = useState([]);
-  const isEditing = Boolean(props.initialData);
 
   useEffect(() => {
-    if (props.initialData) {
-      setTitle(props.initialData.title || '');
-      setDescription(props.initialData.description || '');
-      setLinks(props.initialData.links || []);
+    if (initialData) {
+      setTitle(initialData.title || '');
+      setDescription(initialData.description || '');
+      setLinks(initialData.links || []);
     } else {
-      // Сброс формы при создании новой карточки
       setTitle('');
       setDescription('');
       setLinks([]);
@@ -35,7 +35,7 @@ function CardModal(props) {
     setLinks([]);
     setTitle('');
     setDescription('');
-    props.onHide();
+    onHide();
   };
 
   const removeLink = (index) => {
@@ -44,17 +44,21 @@ function CardModal(props) {
     setLinks(newLinks);
   };
   
-  const handleSave = () => {
-    const cardData = {
+  const handleSave = async() => {
+    console.log(roadmapId)
+    const result = await cardAPI.addCard(roadmapId, title,  description, numberOfCards+1)
+    for(let link of links)
+      await cardLinkAPI.addCardLink(result.card_id, link.title, link.content)
+    const newCard = {
+      id: result.card_id,
       title,
       description,
-      links
+      links,
+      roadmap_id: roadmapId,
+      order_position:numberOfCards+1
     };
-    
-    if (props.onSave) {
-      props.onSave(cardData);
-    }
-    
+
+    onSave(newCard);
     handleClose();
   };
 

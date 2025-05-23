@@ -1,50 +1,58 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "react-bootstrap/Card";
 import { Accordion, Button, Dropdown } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
-import {BsBookmark,BsBookmarkFill,BsThreeDotsVertical} from "react-icons/bs";
-import { EditRoadmap } from "./RoadmapRedact";
+import {
+  BsBookmark,
+  BsBookmarkFill,} from "react-icons/bs";
+import { PiTrashBold } from "react-icons/pi";
 import "./RoadmapView.css";
 import { minioAPI, userRoadmapAPI } from "../api/api";
 
-function RoadmapView({ roadmapData }) {
+function RoadmapView({ roadmapData, onRemove}) {
   const location = useLocation();
   const pathWithCards = `${location.pathname}/${roadmapData.id}`;
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [background, setBackground] = useState();
+  const isMade = (roadmapData.owner_id == JSON.parse(localStorage.getItem("userData")).id);
+
   useEffect(() => {
     const getBackground = async () => {
-      let filename = await userRoadmapAPI.getBackgroundFilename(roadmapData.id);
-      if (filename === undefined)
-      {filename = import.meta.env.VITE_DEFAULT_BACKGROUND}
+      const filename = await userRoadmapAPI.getBackgroundFilename(
+        roadmapData.id
+      );
       const imageurl = minioAPI.getImageUrl(filename, "backgrounds");
-      console.log(filename)
       setBackground(imageurl);
-    }
-      getBackground()
-    },[roadmapData.id])
+    };
+    getBackground();
+  }, [roadmapData.id]);
 
- 
-  // тут надо как то получать состояния роадмапа: кем он создан и можно ли редактировать
-  let isMade = true;
-  let mayRedact = true;
+  useEffect(() => {
+    const checkLinked = async () => {
+      let linkedRoadmaps = await userRoadmapAPI.getLinkedRoadmaps();
+      const linkedIds = Object.values(linkedRoadmaps.roadmaps).map(
+        (item) => item.id
+      );
+      setIsBookmarked(linkedIds.includes(roadmapData.id));
+    };
+    checkLinked();
+  }, [roadmapData.id]);
 
-  const handleBookmark = async() => {
-    if(isBookmarked==false){
+  const handleBookmark = async () => {
+    if (isBookmarked == false) {
       await userRoadmapAPI.linkUserToRoadmap(roadmapData.id);
-      setIsBookmarked(!isBookmarked);
-    }
-    else{
-      await userRoadmapAPI.unlinkUserFromRoadmap()
+      setIsBookmarked(true);
+    } else {
+      await userRoadmapAPI.unlinkUserFromRoadmap(roadmapData.id);
+      setIsBookmarked(false);
     }
   };
-  
-  let roadmapToEdit
-    
-  const handleUpdateRoadmap=()=>{
 
-  }
-  const [modalShow, setModalShow] = React.useState(false);
+  const handleUnsubscribe = async () => {
+    await userRoadmapAPI.unlinkUserFromRoadmap(roadmapData.id);
+    onRemove(roadmapData.id);
+
+  };
 
   return (
     <Card className="bg-light text-dark roadmapcard">
@@ -71,58 +79,25 @@ function RoadmapView({ roadmapData }) {
           >
             <Card.Text>{roadmapData.difficulty}</Card.Text>
             {location.pathname === "/myroadmaps" ? (
-              <Dropdown drop="end">
-                <Dropdown.Toggle
-                  as={Button}
-                  className="roadmap-button"
-                  variant="outline-dark"
-                >
-                  <BsThreeDotsVertical />
-                </Dropdown.Toggle>
-                <Dropdown.Menu style={{ backgroundColor: "white" }}>
-                  {isMade ? <Dropdown.Item
-                    style={{
-                      "--bs-dropdown-link-active-bg": "blueviolet",
-                      textDecoration: " underline",
-                    }}
-                  >
-                    Удалить роадмап
-                  </Dropdown.Item> :
-                  <Dropdown.Item
-                    style={{
-                      "--bs-dropdown-link-active-bg": "blueviolet",
-                      textDecoration: " underline",
-                    }}
-                  >
-                    Отписаться
-                  </Dropdown.Item>}
-                  {mayRedact && <Dropdown.Item
-                    style={{
-                      "--bs-dropdown-link-active-bg": "blueviolet",
-                      textDecoration: " underline",
-                    }}
-                    onClick={() => setModalShow(true)}
-                  >
-                    Изменить роадмап
-                  </Dropdown.Item>
-                  }
-                </Dropdown.Menu>
-              </Dropdown>
-            ) : (
               <Button
                 className="roadmap-button"
                 variant="outline-dark"
-                onClick={handleBookmark}
+                onClick={handleUnsubscribe}
               >
-                {isBookmarked ?  <BsBookmarkFill /> : <BsBookmark />}
+                <PiTrashBold />
               </Button>
+            ) : (
+              !isMade && (
+                <Button
+                  className="roadmap-button"
+                  variant="outline-dark"
+                  onClick={handleBookmark}
+                >
+                  {isBookmarked ? <BsBookmarkFill /> : <BsBookmark />}
+                </Button>
+              )
             )}
-            <EditRoadmap 
-              show={modalShow}
-              onHide={() =>setModalShow(false)}
-              initialData={roadmapToEdit}
-              onSave={handleUpdateRoadmap}
-            />
+            
           </Card.Footer>
         </Card.Body>
         <Card.Img src={background} alt="Card image" className="cardimg" />

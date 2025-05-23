@@ -5,45 +5,69 @@ import CardView from "../components/CardView";
 import { Button, Form, Card } from "react-bootstrap";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import { FaRegPlusSquare } from "react-icons/fa";
-import CardModal, { CreateCard } from "../components/Cardredact";
+import { PiNotePencilBold } from "react-icons/pi";
+import CardModal, { CreateCard } from "../components/CardRedact";
+import { EditRoadmap } from "../components/RoadmapRedact";
 import "./CardsPage.css";
 import { minioAPI, roadmapAPI, userRoadmapAPI } from "../api/api";
 
 const CardsPage = () => {
   let [isBookmarked, setIsBookmarked] = useState(false);
-  const [modalShow, setModalShow] = useState(false);
+  const [roadmapModalShow, setRoadmapModalShow] = useState(false);
+  const [cardModalShow, setCardModalShow] = useState(false);
   const location = useLocation();
   const { id } = useParams();
   const [background, setBackground] = useState();
   const [roadmapinfo, setRoadmapinfo] = useState();
+  const [isMade, setIsMade] = useState();
+  const [mayRedact, setMayRedact] = useState();
+  const [cards, setCards] = useState([]);
 
   useEffect(() => {
     const getBackground = async () => {
       let filename = await userRoadmapAPI.getBackgroundFilename(id);
-      console.log(filename)
-      if (filename===undefined)
-      {filename = import.meta.env.VITE_DEFAULT_BACKGROUND}
+      if (filename === undefined) {
+        filename = import.meta.env.VITE_DEFAULT_BACKGROUND;
+      }
       const imageurl = minioAPI.getImageUrl(filename, "backgrounds");
       setBackground(imageurl);
     };
-    const getRoadmapInfo = async () =>{
-        const roadmap = await roadmapAPI.getRoadmapById(id);
-        setRoadmapinfo(roadmap);
+    const getRoadmapInfo = async () => {
+      const roadmap = await roadmapAPI.getRoadmapById(id);
+      setRoadmapinfo(roadmap);
+      setCards(roadmap.cards || []); 
+      setIsMade(roadmap.owner_id === JSON.parse(localStorage.getItem("userData")).id);
+      setMayRedact(roadmap.edit_permission === "can edit" || roadmap.owner_id === JSON.parse(localStorage.getItem("userData")).id);
     };
     getBackground();
     getRoadmapInfo();
   }, [id]);
 
+  useEffect(() => {
+    const checkLinked = async () => {
+      let linkedRoadmaps = await userRoadmapAPI.getLinkedRoadmaps();
+      const linkedIds = Object.values(linkedRoadmaps.roadmaps).map((item) => item.id);
+      setIsBookmarked(linkedIds.includes(roadmapinfo?.id));
+    };
+    checkLinked();
+  }, [id, roadmapinfo]);
 
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
+  const handleBookmark = async () => {
+    if (isBookmarked == false) {
+      await userRoadmapAPI.linkUserToRoadmap(roadmapinfo.id);
+      setIsBookmarked(true);
+    } else {
+      await userRoadmapAPI.unlinkUserFromRoadmap(roadmapinfo.id);
+      setIsBookmarked(false);
+    }
   };
 
-  if (location.pathname === "/myroadmaps/cards") {
-    isBookmarked = true;
-  }
-  const mayRedact = true;
-  const handleCreateCard = () => {};
+  const handleDeleteCard = (cardId) => {
+    setCards((prev) => prev.filter((card) => card.id !== cardId));
+  };
+  const handleAddCard = (newCard) => {
+    setCards((prev) => [...prev, newCard]);
+  };
 
   return (
     <div>
@@ -60,26 +84,40 @@ const CardsPage = () => {
           <Card.Body>
             <Card.Text>{roadmapinfo?.description}</Card.Text>
           </Card.Body>
-          <Card.Footer style={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              className="add-button"
-              variant="outline-dark"
-              onClick={handleBookmark}
-            >
-              {isBookmarked ? <BsBookmarkFill /> : <BsBookmark />}
-            </Button>
+          <Card.Footer style={{ display: "flex", justifyContent: "flex-end" }} className="gap-3">
+            {location.pathname === `/myroadmaps/${roadmapinfo?.id}` ? (
+              mayRedact && (
+                <Button
+                  className="add-button"
+                  variant="outline-dark"
+                  onClick={() => setRoadmapModalShow(true)}
+                >
+                  <PiNotePencilBold />
+                </Button>
+              )
+            ) : (
+              !isMade && (
+                <Button
+                  className="add-button"
+                  variant="outline-dark"
+                  onClick={handleBookmark}
+                >
+                  {isBookmarked ? <BsBookmarkFill /> : <BsBookmark />}
+                </Button>
+              )
+            )}
           </Card.Footer>
         </Card>
 
         <div className="cardblock">
-          {roadmapinfo?.cards?.map((card, index) => (
-          <CardView key={index} cardInfo={card} mayRedact={roadmapinfo?.edit_permission==="view only"}/>
-        ))}
-          {location.pathname === "/myroadmaps/cards" && mayRedact && (
+          {cards?.map((card, index) => (
+            <CardView key={index} cardInfo={card} mayRedact={mayRedact} onDelete={handleDeleteCard} />
+          ))}
+          {location.pathname === `/myroadmaps/${roadmapinfo?.id}` && mayRedact && (
             <Button
               variant="light"
               className="addcardbutton"
-              onClick={() => setModalShow(true)}
+              onClick={() => setCardModalShow(true)}
             >
               <FaRegPlusSquare />
             </Button>
@@ -87,9 +125,16 @@ const CardsPage = () => {
         </div>
       </div>
       <CreateCard
-        show={modalShow}
-        onHide={() => setModalShow(false)}
-        onSave={handleCreateCard}
+        show={cardModalShow}
+        onHide={() => setCardModalShow(false)}
+        roadmapId={roadmapinfo?.id}
+        onSave={handleAddCard}
+        numberOfCards={cards.length}
+      />
+      <EditRoadmap
+        show={roadmapModalShow}
+        onHide={() => setRoadmapModalShow(false)}
+        initialData={roadmapinfo}
       />
     </div>
   );
