@@ -60,6 +60,7 @@ class RoadmapsService:
                 roadmap_dict["cards"].append(
                     await CardsService.get_card_extended(uow, card.id, user_id)
                 )
+            roadmap_dict["cards"].sort(key=lambda x: x.order_position)
             logger.debug("\n\n\n", roadmap_dict, "\n\n\n")
             extended_roadmap = RoadmapExtendedDTO.model_validate(
                 roadmap_dict, from_attributes=True

@@ -50,9 +50,9 @@ class CardsService:
             card_dict = card.model_dump()
             card_links = await uow.card_links.find_all({"card_id": card.id})
 
-            card_dict["links"] = sorted(
+            card_dict["links"] = [
                 card_link.model_dump() for card_link in (card_links or [])
-            )
+            ]
 
             card_status: UserCardDTO = await uow.user_cards.find_one(
                 user_id=user_id, card_id=card_id
