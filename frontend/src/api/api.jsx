@@ -465,7 +465,7 @@ export const minioAPI = {
     formData.append("file", file);
     try {
       const response = await apiClient.post(
-        `/api/images/files/${bucket}`,
+        `http://localhost:8080/files/${bucket}`,
         formData,
         {
           headers: {
@@ -481,12 +481,12 @@ export const minioAPI = {
   getImageUrl: (filename, bucket = "avatars") => {
     if (!filename) return null;
 
-    return `/api/images/files/${bucket}/${filename}`;
+    return `http://localhost:8080/files/${bucket}/${filename}`;
   },
   deleteImage: async (filename, bucket = "avatars") => {
     try {
       const response = await apiClient.delete(
-        `/api/images/files/${bucket}/${filename}`
+        `http://localhost:8080/files/${bucket}/${filename}`
       );
       return response.data;
     } catch (error) {
