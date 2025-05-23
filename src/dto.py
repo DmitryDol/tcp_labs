@@ -132,6 +132,7 @@ class UserCardDTO(UserCardAddDTO):
 class UserCardEditDTO(BaseModel):
     status: str
 
+
 class UserCardEditWithUserIdDTO(UserCardEditDTO):
     card_id: int
 
