@@ -79,7 +79,7 @@ class RoadmapEditDTO(BaseModel):
 class CardAddDTO(BaseModel):
     roadmap_id: int
     title: str
-    description: str | None
+    description: str | None = None
     order_position: int
 
 
@@ -90,9 +90,9 @@ class CardDTO(CardAddDTO):
 
 
 class CardEditDTO(BaseModel):
-    title: str | None
-    description: str | None
-    order_position: int | None
+    title: str | None = None
+    description: str | None = None
+    order_position: int | None = None
 
 
 class UserRoadmapAddDTO(BaseModel):
@@ -101,7 +101,7 @@ class UserRoadmapAddDTO(BaseModel):
 
 
 class UserRoadmapAddExtendedDTO(UserRoadmapAddDTO):
-    card_ids: list[int] | None
+    card_ids: list[int] | None = None
 
 
 class UserRoadmapDTO(UserRoadmapAddDTO):
@@ -109,7 +109,7 @@ class UserRoadmapDTO(UserRoadmapAddDTO):
 
 
 class BackgroundDTO(BaseModel):
-    background: str | None
+    background: str | None = None
 
 
 class AvatarDTO(BaseModel):
@@ -147,19 +147,19 @@ class CardLinkDTO(CardLinkAddDTO):
 
 
 class CardLinkEditDTO(BaseModel):
-    link_title: str | None
-    link_content: str | None
+    link_title: str | None = None
+    link_content: str | None = None
 
 
 class CardExtendedDTO(CardDTO):
-    links: list[CardLinkDTO | None]
-    status: str | None
+    links: list[CardLinkDTO | None] = []
+    status: str | None = None
 
 
 class RoadmapExtendedDTO(RoadmapDTO):
-    cards: list[CardExtendedDTO | None]
+    cards: list[CardExtendedDTO | None] = []
 
 
 class PaginatedRoadmapsDTO(BaseModel):
-    roadmaps: list[SimplifiedRoadmapDTO | None]
+    roadmaps: list[SimplifiedRoadmapDTO | None] = []
     total_pages: int
