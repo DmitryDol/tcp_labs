@@ -4,7 +4,6 @@ import { minioAPI, roadmapAPI, userRoadmapAPI } from "../api/api";
 
 function RoadmapModal(props) {
   const { isEditing, initialData, onHide, onSave } = props;
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
@@ -19,7 +18,9 @@ function RoadmapModal(props) {
       setDescription(initialData.description || "");
       setDifficulty(initialData.difficulty || "");
       setVisibility(initialData.visibility || "");
-      setEditPermission(initialData.editPermission || "");
+      const editPermissionValue = initialData.edit_permission === "view only" ? "view_only": 
+      initialData.edit_permission === "can edit" ? "can_edit": "";
+      setEditPermission(editPermissionValue || "");
     }
   }, [isEditing, initialData]);
 
@@ -32,21 +33,21 @@ function RoadmapModal(props) {
     onHide();
   };
 
-  const handleSave = async () => {
-    if (!isEditing) {
-      const response = await roadmapAPI.addRoadmap(
-        JSON.parse(localStorage.getItem("userData")).id,
-        title,
-        description,
-        difficulty,
-        editPermission,
-        visibility
-      );
-      console.log(response.roadmap_id)
-      if(image){
-        await userRoadmapAPI.changeRoadmapBackground(response.roadmap_id, image)
-      }
-      const newRoadmap = {
+ const handleSave = async () => {
+  if (!isEditing) {
+    const response = await roadmapAPI.addRoadmap(
+      JSON.parse(localStorage.getItem("userData")).id,
+      title,
+      description,
+      difficulty,
+      editPermission,
+      visibility
+    );
+    console.log(response.roadmap_id)
+    if(image){
+      await userRoadmapAPI.changeRoadmapBackground(response.roadmap_id, image)
+    }
+    const newRoadmap = {
       id: response.roadmap_id,
       title,
       description,
@@ -54,10 +55,24 @@ function RoadmapModal(props) {
       visibility,
       editPermission,
     };
-      onSave(newRoadmap);
+    onSave(newRoadmap);
+  } else {
+    await roadmapAPI.editRoadmap(
+      initialData.id,
+      title,
+      description,
+      difficulty,
+      editPermission,
+      visibility
+    );
+    if (image) {
+      await userRoadmapAPI.changeRoadmapBackground(initialData.id, image);
     }
-    handleClose();
-  };
+    window.location.reload();
+  }
+  handleClose();
+};
+// ... existing code ...
 
   return (
     <Modal

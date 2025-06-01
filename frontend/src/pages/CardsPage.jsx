@@ -52,6 +52,14 @@ const CardsPage = () => {
     checkLinked();
   }, [id, roadmapinfo]);
 
+  useEffect(() => {
+    const updateCards = async () => {
+      const cards = await roadmapAPI.getRoadmapById(id);
+      setCards(cards.cards || []);
+    };
+    updateCards();
+  }, [cardModalShow]);
+
   const handleBookmark = async () => {
     if (isBookmarked == false) {
       await userRoadmapAPI.linkUserToRoadmap(roadmapinfo.id);
@@ -65,10 +73,9 @@ const CardsPage = () => {
   const handleDeleteCard = (cardId) => {
     setCards((prev) => prev.filter((card) => card.id !== cardId));
   };
-  const handleAddCard = (newCard) => {
-    setCards((prev) => [...prev, newCard]);
-  };
-
+  // const handleAddCard = (newCard) => {
+  //   setCards((prev) => [...prev, newCard]);
+  // };
   return (
     <div>
       <Header showButtons={true} />
@@ -128,8 +135,8 @@ const CardsPage = () => {
         show={cardModalShow}
         onHide={() => setCardModalShow(false)}
         roadmapId={roadmapinfo?.id}
-        onSave={handleAddCard}
-        numberOfCards={cards.length}
+        // onSave={handleAddCard}
+        numberOfCards={cards.length > 0 ? cards[cards.length-1]?.order_position   : 1}
       />
       <EditRoadmap
         show={roadmapModalShow}

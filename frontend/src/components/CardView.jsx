@@ -14,6 +14,13 @@ function CardView({cardInfo, mayRedact, onDelete}) {
     useEffect(() => {
         setSelectedStatus(cardInfo.status);
     }, [cardInfo.id, cardInfo.status]);
+
+    useEffect(()=>{
+        const getCard = async()=>{
+            cardInfo = await cardAPI.getCard(cardInfo.id)
+        }
+        getCard()
+    },[modalShow, cardInfo.id])
     const handleStatusChange = async (event) => {
         const newStatus = event.target.value;
         setSelectedStatus(newStatus);
@@ -24,9 +31,7 @@ function CardView({cardInfo, mayRedact, onDelete}) {
         onDelete(cardInfo.id); 
     };
     
-    function handleUpdate(){
-
-    }
+    
     return(
         <Card className="cardcard">
             <Card.Header className="cardhead">
@@ -67,7 +72,6 @@ function CardView({cardInfo, mayRedact, onDelete}) {
                 show={modalShow} 
                 onHide={() => setModalShow(false)}
                 initialData={cardInfo}
-                onSave={handleUpdate} 
             />
         </Card>
     )

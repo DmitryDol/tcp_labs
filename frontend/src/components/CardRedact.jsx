@@ -4,7 +4,7 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import { cardAPI, cardLinkAPI } from '../api/api';
 
 function CardModal(props) {
-  const { roadmapId, isEditing, initialData, onSave, numberOfCards, onHide} = props;
+  const { roadmapId, isEditing, initialData, numberOfCards, onHide } = props;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [links, setLinks] = useState([]);
@@ -13,7 +13,7 @@ function CardModal(props) {
     if (initialData) {
       setTitle(initialData.title || '');
       setDescription(initialData.description || '');
-      setLinks(initialData.links || []);
+      setLinks(initialData.links);
     } else {
       setTitle('');
       setDescription('');
@@ -43,22 +43,59 @@ function CardModal(props) {
     newLinks.splice(index, 1);
     setLinks(newLinks);
   };
-  
-  const handleSave = async() => {
-    console.log(roadmapId)
-    const result = await cardAPI.addCard(roadmapId, title,  description, numberOfCards+1)
-    for(let link of links)
-      await cardLinkAPI.addCardLink(result.card_id, link.title, link.content)
-    const newCard = {
-      id: result.card_id,
-      title,
-      description,
-      links,
-      roadmap_id: roadmapId,
-      order_position:numberOfCards+1
-    };
 
-    onSave(newCard);
+  const handleSave = async () => {
+    if (!isEditing) {
+      const result = await cardAPI.addCard(roadmapId, title, description, numberOfCards + 1)
+      const addedLinks = []
+      for (let link of links) {
+        const linkResult = await cardLinkAPI.addCardLink(result.card_id, link.link_title, link.link_content)
+        addedLinks.push({ id: linkResult, title: link.link_title, content: link.link_content })
+      }
+
+      // const newCard = {
+      //   id: result.card_id,
+      //   title,
+      //   description,
+      //   links: addedLinks,
+      //   roadmap_id: roadmapId,
+      //   order_position: numberOfCards + 1
+      // };
+      // onSave(newCard);
+      handleClose();
+    }
+    else {
+      await cardAPI.editCard(initialData.id, title, description);
+
+      const originalLinks = initialData.links || [];
+      const currentLinks = links || [];
+      const processedLinkIds = new Set(); 
+
+      const updatedLinks = [];
+      for (const link of currentLinks) {
+        if (link.id) {
+          await cardLinkAPI.editCardLink(link.id, link.link_title, link.link_content);
+          processedLinkIds.add(link.id);
+          updatedLinks.push(link);
+        } else if (link.link_title || link.link_content) {
+          console.log(link)
+          const linkResult = await cardLinkAPI.addCardLink(initialData.id, link.link_title, link.link_content);
+          if (linkResult && linkResult.id) {
+              processedLinkIds.add(linkResult.id);
+              updatedLinks.push({ id: linkResult.id, title: link.link_title, content: link.link_content });
+          } else {
+              console.error("Failed to add link or get link ID", linkResult);
+          }
+        }
+      }
+
+      for (const originalLink of originalLinks) {
+        if (originalLink.id && !processedLinkIds.has(originalLink.id)) {
+          await cardLinkAPI.deleteLinkFromCard(originalLink.id);
+        }
+      }
+    }
+
     handleClose();
   };
 
@@ -79,9 +116,9 @@ function CardModal(props) {
         <Form>
           <Form.Group className="mb-3" controlId="formRoadmapTitle">
             <Form.Label>Название</Form.Label>
-            <Form.Control 
-              type="text" 
-              placeholder="Введите название" 
+            <Form.Control
+              type="text"
+              placeholder="Введите название"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -107,26 +144,26 @@ function CardModal(props) {
           {links.map((link, index) => (
             <div key={index}>
               <Form.Group className="mt-3" controlId={`formLinkTitle${index}`}>
-                <Form.Label style={{display: "flex", alignItems: "center",justifyContent: "space-between"}}>
+                <Form.Label style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span>{index + 1}</span>
                   <Button variant="danger" size="sm" onClick={() => removeLink(index)}>
-                    <FaRegTrashAlt/>
+                    <FaRegTrashAlt />
                   </Button>
                 </Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Введите название ссылки"
-                  value={link.title}
+                  value={link.link_title}
                   onChange={(e) =>
-                    handleLinkChange(index, "title", e.target.value)
+                    handleLinkChange(index, "link_title", e.target.value)
                   }
                 />
                 <Form.Control
                   type="text"
                   placeholder="Введите содержимое ссылки"
-                  value={link.content}
+                  value={link.link_content}
                   onChange={(e) =>
-                    handleLinkChange(index, "content", e.target.value)
+                    handleLinkChange(index, "link_content", e.target.value)
                   }
                 />
               </Form.Group>
@@ -151,11 +188,11 @@ function CardModal(props) {
 }
 
 export function CreateCard(props) {
-  return <CardModal {...props} initialData={null} />;
+  return <CardModal {...props} initialData={null} isEditing={false} />;
 }
 
 export function EditCard(props) {
-  return <CardModal {...props} initialData={props.initialData} />;
+  return <CardModal {...props} initialData={props.initialData} isEditing={true} />;
 }
 
 export default CardModal;

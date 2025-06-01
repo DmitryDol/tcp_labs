@@ -12,7 +12,7 @@ export default defineConfig({
     },
     proxy: {
       "/api/core": {
-        target: "http://fastapi_app:8000",
+        target: "http://localhost:8000",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/core/, ""),
       },

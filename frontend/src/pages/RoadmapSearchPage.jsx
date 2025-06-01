@@ -8,7 +8,7 @@ import { roadmapAPI } from "../api/api";
 import "./RoadmapSearchPage.css"
 
 const RoadmapSearchPage = () => {
-  const itemsPerPage = 6;
+  const itemsPerPage = 4;
   const [roadmaps, setRoadmaps] = useState([]);
   const [activePage, setActivePage] = useState(1);
   const [searchText, setSearchText] = useState('');

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const apiClient = axios.create({
   withCredentials: true,
@@ -450,7 +449,7 @@ export const userCardAPI = {
         status: cardStatus,
         card_id: cardId
       }
-      const response = await apiClient.put('api/core/user_cards/status', editUserCardData)
+      const response = await apiClient.put('/api/core/user_cards/status', editUserCardData)
       return response.data
     } catch (error) {
       handleError(error, "changing user card status")

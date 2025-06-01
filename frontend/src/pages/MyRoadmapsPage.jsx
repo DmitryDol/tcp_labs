@@ -12,35 +12,32 @@ const MyRoadmapsPage = () => {
   const [roadmaps, setRoadmaps] = useState([]);
   const [activePage, setActivePage] = useState(1);
   
-  useEffect(() => {
-    const fetchRoadmaps = async () => {
-      const params = {
-        limit: itemsPerPage,
-        page: activePage,
-      };
-      const roadmapsData = await userRoadmapAPI.getLinkedRoadmaps(params);
-      setRoadmaps(roadmapsData);
-    };
-    fetchRoadmaps();
-  }, [itemsPerPage, activePage, roadmaps]);
 
-  const removeRoadmap = (id) => {
-    setRoadmaps((prev) => {
-      const updated = {
-        ...prev,
-        roadmaps: prev.roadmaps.filter((r) => r.id !== id),
-      };
-      if (updated.roadmaps.length === 0 && activePage > 1) {
-        setActivePage(activePage - 1);
-      }
-      return updated;
-    });
+  const fetchRoadmaps = async (itemsPerPage, activePage) => {
+    const params = {
+      limit: itemsPerPage,
+      page: activePage,
+    };
+    const roadmapsData = await userRoadmapAPI.getLinkedRoadmaps(params);
+    setRoadmaps(roadmapsData);
+  };
+
+  useEffect(() => {
+    fetchRoadmaps(itemsPerPage, activePage);
+  }, [itemsPerPage, activePage]);
+
+  useEffect(() => {
+    if ( roadmaps?.roadmaps?.length === 0 && activePage > 1) {
+      setActivePage(prevPage => prevPage - 1); 
+    }
+    
+  }, [roadmaps, activePage]); 
+
+  const removeRoadmap = () => {
+    fetchRoadmaps(itemsPerPage,activePage );
   };
   const handleAddRoadmap = (newRoadmap) => {
-  setRoadmaps((prev) => ({
-    ...prev,
-    roadmaps: [...(prev.roadmaps || []), newRoadmap], 
-  }));
+    fetchRoadmaps(itemsPerPage,activePage)
   };
 
   const [modalShow, setModalShow] = React.useState(false);
