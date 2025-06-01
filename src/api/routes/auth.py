@@ -47,7 +47,12 @@ async def login_for_access_token(
         timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
-    refresh_token = create_token(user.id, user.login, user.name, timedelta(days=7))
+    refresh_token = create_token(
+        user.id,
+        user.login,
+        user.name,
+        timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+    )
 
     response.set_cookie(
         key="access_token",

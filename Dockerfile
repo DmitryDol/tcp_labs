@@ -42,7 +42,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 EXPOSE 8000
 
-#RUN cd /app alembic upgrade head
-#RUN uv run fill_database.py
-
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
